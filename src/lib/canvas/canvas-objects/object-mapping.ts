@@ -14,7 +14,6 @@ export const CavasObjectMap: {
     [ElementEnum.Line]: (initValues, parent) => new Line(initValues, parent),
     [ElementEnum.Square]: (initValues, parent) => new Square(initValues, parent),
     [ElementEnum.Circle]: (initValues, parent) => new Circle(initValues, parent),
-    [ElementEnum.Ellipse]: (initValues, parent) => new Rectangle(initValues, parent),
     [ElementEnum.Pencil]: (initValues, parent) => new Pencil(initValues, parent),
     [ElementEnum.Move]: function (): ICanvasObjectWithId {
         throw new Error("Function not implemented.");

@@ -7,6 +7,7 @@ import {
     CANVAS_SCALING_LIMIT,
     CANVAS_SCALING_MULTIPLIER,
     CanvasHelper,
+    SELECTION_ELEMENT_ID,
     SelectionStyle
 } from "../canvas-helpers";
 import { CanvasBoard } from "./canvas-board";
@@ -32,7 +33,8 @@ export class EventManager {
         }
         if (
             this.Board._selectedElements.length != 0 &&
-            (this.Board.HoveredObject == null || this.Board.HoveredObject.id != this.Board._selectedElements[0].id)
+            (this.Board.HoveredObject == null || this.Board.HoveredObject.id != this.Board._selectedElements[0].id) &&
+            (this.Board.SelectionElement == null || this.Board._currentCanvasAction == CanvasActionEnum.Select)
         ) {
             this.Board.unSelectElements();
         }
@@ -58,19 +60,40 @@ export class EventManager {
                         });
                     }
                 } else {
-                    this.Board._currentCanvasAction = CanvasActionEnum.Select;
-                    this.Board._tempSelectionArea = CavasObjectMap[ElementEnum.Rectangle](
-                        {
-                            x: offsetX,
-                            y: offsetY,
-                            h: 0,
-                            w: 0,
-                            id: uuid(),
-                            style: SelectionStyle
-                        },
-                        this.Board
-                    );
-                    this.Board._tempSelectionArea.create(context);
+                    CanvasHelper.clearCanvasArea(context, this.Board.Transform);
+                    if (this.Board.SelectionElement) {
+                        this.Board._tempSelectionArea = this.Board.SelectionElement;
+                        if (this.Board._currentCanvasAction == CanvasActionEnum.Resize) {
+                            this.Board._tempSelectionArea.resize(
+                                context,
+                                { dx: 0, dy: 0 },
+                                this.Board.CursorPosition!,
+                                "down"
+                            );
+                        } else if (this.Board._currentCanvasAction == CanvasActionEnum.Move) {
+                            this.Board._tempSelectionArea.move(context, { x: 0, y: 0 }, "down");
+                        } else {
+                            this.Board._tempSelectionArea.update(
+                                context,
+                                { x: offsetX, y: offsetY, h: 0, w: 0 },
+                                "down"
+                            );
+                        }
+                    } else {
+                        this.Board._currentCanvasAction = CanvasActionEnum.Select;
+                        this.Board._tempSelectionArea = CavasObjectMap[ElementEnum.Rectangle](
+                            {
+                                x: offsetX,
+                                y: offsetY,
+                                h: 0,
+                                w: 0,
+                                id: `temp-${SELECTION_ELEMENT_ID}`,
+                                style: SelectionStyle
+                            },
+                            this.Board
+                        );
+                        this.Board._tempSelectionArea.create(context);
+                    }
                 }
             }
         } else {
@@ -92,6 +115,7 @@ export class EventManager {
     }
 
     onMouseMove(e: MouseEvent) {
+        console.log(this.Board._tempSelectionArea);
         if (!this.Board.CanvasCopy) {
             return;
         }
@@ -111,25 +135,46 @@ export class EventManager {
                 this.Board.PointerOrigin = { x: offsetX, y: offsetY };
                 this.Board.redrawBoard();
             } else if (this.Board.ElementType == ElementEnum.Move) {
-                if (this.Board._currentCanvasAction == CanvasActionEnum.Select && this.Board._tempSelectionArea) {
-                    this.Board._tempSelectionArea.update(
-                        context,
-                        {
-                            w: offsetX - x,
-                            h: offsetY - y
-                        },
-                        "move"
-                    );
-                } else if (this.Board._currentCanvasAction == CanvasActionEnum.Resize && this.Board.CursorPosition) {
-                    this.Board.SelectedElements = [];
-                    this.Board.ActiveObjects.forEach((ao) => {
-                        ao.resize(context, { dx: offsetX - x, dy: offsetY - y }, this.Board.CursorPosition!, "move");
-                    });
+                if (this.Board._tempSelectionArea) {
+                    if (this.Board._currentCanvasAction == CanvasActionEnum.Select) {
+                        this.Board._tempSelectionArea.update(
+                            context,
+                            {
+                                w: offsetX - x,
+                                h: offsetY - y
+                            },
+                            "move"
+                        );
+                    } else if (this.Board._currentCanvasAction == CanvasActionEnum.Move) {
+                        this.Board._tempSelectionArea.move(context, { x: offsetX - x, y: offsetY - y }, "move");
+                    } else if (
+                        this.Board._currentCanvasAction == CanvasActionEnum.Resize &&
+                        this.Board.CursorPosition
+                    ) {
+                        this.Board._tempSelectionArea.resize(
+                            context,
+                            { dx: offsetX - x, dy: offsetY - y },
+                            this.Board.CursorPosition!,
+                            "move"
+                        );
+                    }
                 } else {
-                    this.Board.SelectedElements = [];
-                    this.Board.ActiveObjects.forEach((ao) => {
-                        ao.move(context, { x: offsetX - x, y: offsetY - y }, "move");
-                    });
+                    if (this.Board._currentCanvasAction == CanvasActionEnum.Resize && this.Board.CursorPosition) {
+                        this.Board.SelectedElements = [];
+                        this.Board.ActiveObjects.forEach((ao) => {
+                            ao.resize(
+                                context,
+                                { dx: offsetX - x, dy: offsetY - y },
+                                this.Board.CursorPosition!,
+                                "move"
+                            );
+                        });
+                    } else {
+                        this.Board.SelectedElements = [];
+                        this.Board.ActiveObjects.forEach((ao) => {
+                            ao.move(context, { x: offsetX - x, y: offsetY - y }, "move");
+                        });
+                    }
                 }
             } else {
                 this.Board.ActiveObjects.forEach((ao) => {
@@ -165,12 +210,12 @@ export class EventManager {
                         this.Board._currentCanvasAction = CanvasActionEnum.Resize;
                     }
                     this.Board.CanvasCopy.style.cursor = CanvasHelper.getCursor(this.Board.CursorPosition);
-                    this.Board.HoveredObject = this.Board.SelectionElement;
+                    this.Board._tempSelectionArea = this.Board.SelectionElement;
                 } else {
                     this.Board.CursorPosition = null;
                     this.Board._currentCanvasAction = CanvasActionEnum.Select;
                     this.Board.CanvasCopy.style.cursor = "default";
-                    this.Board.HoveredObject = null;
+                    this.Board._tempSelectionArea = null;
                 }
             } else {
                 const ele = CanvasHelper.hoveredElement({ x: offsetX, y: offsetY }, this.Board.Elements);
@@ -215,39 +260,50 @@ export class EventManager {
         const { x, y } = this.Board.PointerOrigin;
         const { offsetX, offsetY } = CanvasHelper.getCurrentMousePosition(e, this.Board.Transform);
         if (this.Board._tempSelectionArea) {
-            this.Board._tempSelectionArea.update(
-                context,
-                {
-                    w: offsetX - x,
-                    h: offsetY - y,
-                    points: [[offsetX, offsetY]]
-                },
-                "up"
-            );
-            const { h = 0, w = 0, x: sax = 0, y: say = 0 } = this.Board._tempSelectionArea.getValues();
-            this.Board.SelectedElements = CanvasHelper.getElementsInsideArea(
-                { height: h, width: w, x: sax, y: say },
-                this.Board.Elements
-            );
-            if (this.Board.SelectedElements.length <= 0) {
-                this.Board.PointerOrigin = null;
-                this.Board.unSelectElements();
-                return;
+            if (this.Board._currentCanvasAction == CanvasActionEnum.Resize) {
+                this.Board._tempSelectionArea.resize(
+                    context,
+                    { dx: offsetX - x, dy: offsetY - y },
+                    this.Board.CursorPosition!,
+                    "up"
+                );
+            } else if (this.Board._currentCanvasAction == CanvasActionEnum.Move) {
+                this.Board._tempSelectionArea.move(context, { x: offsetX - x, y: offsetY - y }, "up");
+            } else {
+                this.Board._tempSelectionArea.update(
+                    context,
+                    {
+                        w: offsetX - x,
+                        h: offsetY - y,
+                        points: [[offsetX, offsetY]]
+                    },
+                    "up"
+                );
+                const { h = 0, w = 0, x: sax = 0, y: say = 0 } = this.Board._tempSelectionArea.getValues();
+                this.Board.SelectedElements = CanvasHelper.getElementsInsideArea(
+                    { height: h, width: w, x: sax, y: say },
+                    this.Board.Elements
+                );
+                if (this.Board.SelectedElements.length <= 0) {
+                    this.Board.PointerOrigin = null;
+                    this.Board.unSelectElements();
+                    return;
+                }
+                // Uncomment if individual selection is required
+                // this.Board.SelectedElements.forEach((ele) => {
+                //     ele.select(ele.getValues());
+                // });
+                const selectedAreaBoundary = CanvasHelper.getSelectedAreaBoundary(this.Board.SelectedElements);
+                this.Board._tempSelectionArea.update(
+                    context,
+                    {
+                        ...selectedAreaBoundary
+                    },
+                    "up"
+                );
+                this.Board._tempSelectionArea.draw(context);
+                this.Board._tempSelectionArea.select({});
             }
-            // Uncomment if individual selection is required
-            // this.Board.SelectedElements.forEach((ele) => {
-            //     ele.select(ele.getValues());
-            // });
-            const selectedAreaBoundary = CanvasHelper.getSelectedAreaBoundary(this.Board.SelectedElements);
-            this.Board._tempSelectionArea.update(
-                context,
-                {
-                    ...selectedAreaBoundary
-                },
-                "up"
-            );
-            this.Board._tempSelectionArea.draw(context);
-            this.Board._tempSelectionArea.select({});
             this.Board.SelectionElement = this.Board._tempSelectionArea;
         }
         if (this.Board.ActiveObjects.length != 0) {
@@ -282,7 +338,7 @@ export class EventManager {
             context.closePath();
             this.Board.redrawBoard();
             this.Board._currentCanvasAction = CanvasActionEnum.Select;
-            return;
+            this.Board._tempSelectionArea = null;
         }
     }
 

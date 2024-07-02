@@ -408,9 +408,10 @@ export class CanvasBoard implements ICanvas {
                         this.ActiveObjects.forEach((ele) => {
                             ele.draw(contextCopy);
                         });
-                        if (this._tempSelectionArea) {
-                            this._tempSelectionArea.draw(contextCopy);
+                        if (this.SelectionElement) {
+                            this.SelectionElement.draw(contextCopy);
                         }
+                        contextCopy.restore();
                     }
                 }
                 const context = this.Canvas.getContext("2d");

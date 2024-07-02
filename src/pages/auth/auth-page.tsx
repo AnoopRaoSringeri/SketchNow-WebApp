@@ -51,7 +51,7 @@ const Animation = function Animation() {
         const script = document.createElement("script");
         script.innerHTML = "";
         script.src = "/src/pages/animation/script.js";
-        script.type = "text/javascript";
+        script.type = "module";
         script.async = true;
         script.defer = true;
         body.appendChild(script);

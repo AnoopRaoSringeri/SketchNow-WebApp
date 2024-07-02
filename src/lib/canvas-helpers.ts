@@ -25,6 +25,8 @@ export const CANVAS_ZOOM_IN_OUT_FACTOR = 0.05;
 
 export const MIN_INTERVAL = 1;
 
+export const SELECTION_ELEMENT_ID = "select-element";
+
 export const DEFAULT_TRANSFORM: ICanvasTransform = {
     a: 1,
     b: 0,
