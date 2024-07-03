@@ -71,10 +71,13 @@ export class Line implements ICanvasObjectWithId {
     }
 
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
-        if (clearCanvas) {
-            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        }
         const { points = this.points, x = this.x, y = this.y } = objectValue;
+        if (action == "down") {
+            CanvasHelper.applyStyles(ctx, this.style);
+        }
+        if (clearCanvas) {
+            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+        }
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
         if (points.length > 0) {
@@ -90,7 +93,7 @@ export class Line implements ICanvasObjectWithId {
     updateStyle<T extends keyof IObjectStyle>(ctx: CanvasRenderingContext2D, key: T, value: IObjectStyle[T]) {
         this.style[key] = value;
         CanvasHelper.applyStyles(ctx, this.style);
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         this.draw(ctx);
     }
 
@@ -99,7 +102,7 @@ export class Line implements ICanvasObjectWithId {
         if (action == "down") {
             CanvasHelper.applyStyles(ctx, this.style);
         }
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         ctx.beginPath();
         if (this.points.length > 0) {
             const [px, py] = this.points[0];

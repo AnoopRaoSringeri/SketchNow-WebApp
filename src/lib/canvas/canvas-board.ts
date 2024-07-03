@@ -50,6 +50,7 @@ export class CanvasBoard implements ICanvas {
     private EventManager: EventManager;
     _tempSelectionArea: ICanvasObjectWithId | null = null;
     _selectionArea: ICanvasObjectWithId | null = null;
+    _applySelectionStyle = true;
 
     constructor() {
         this.EventManager = new EventManager(this);
@@ -296,6 +297,7 @@ export class CanvasBoard implements ICanvas {
         this.SelectedElements = [];
         this._tempSelectionArea = null;
         this.SelectionElement = null;
+        this._applySelectionStyle = true;
         this.redrawBoard();
     }
 
@@ -411,7 +413,7 @@ export class CanvasBoard implements ICanvas {
                         if (this.SelectionElement) {
                             this.SelectionElement.draw(contextCopy);
                         }
-                        contextCopy.restore();
+                        // contextCopy.restore();
                     }
                 }
                 const context = this.Canvas.getContext("2d");
@@ -423,7 +425,7 @@ export class CanvasBoard implements ICanvas {
                     this.Elements.forEach((ele) => {
                         ele.draw(context);
                     });
-                    context.restore();
+                    // context.restore();
                 }
                 CanvasWorker.onmessage = function (e) {
                     console.log(e.data);

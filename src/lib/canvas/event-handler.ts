@@ -71,7 +71,14 @@ export class EventManager {
                                 "down"
                             );
                         } else if (this.Board._currentCanvasAction == CanvasActionEnum.Move) {
-                            this.Board._tempSelectionArea.move(context, { x: 0, y: 0 }, "down");
+                            this.Board.ActiveObjects = this.Board.SelectedElements;
+                            this.Board.SelectedElements = [];
+                            this.Board.Elements = this.Board.Elements.filter((e) => !e.IsSelected);
+                            this.Board.redrawBoard();
+                            this.Board._tempSelectionArea.move(context, { x: 0, y: 0 }, "down", false);
+                            this.Board.ActiveObjects.forEach((ele) => {
+                                ele.move(context, { x: 0, y: 0 }, "down", false);
+                            });
                         } else {
                             this.Board._tempSelectionArea.update(
                                 context,
@@ -115,7 +122,6 @@ export class EventManager {
     }
 
     onMouseMove(e: MouseEvent) {
-        console.log(this.Board._tempSelectionArea);
         if (!this.Board.CanvasCopy) {
             return;
         }
@@ -146,7 +152,11 @@ export class EventManager {
                             "move"
                         );
                     } else if (this.Board._currentCanvasAction == CanvasActionEnum.Move) {
-                        this.Board._tempSelectionArea.move(context, { x: offsetX - x, y: offsetY - y }, "move");
+                        CanvasHelper.clearCanvasArea(context, this.Board.Transform);
+                        this.Board._tempSelectionArea.move(context, { x: offsetX - x, y: offsetY - y }, "move", false);
+                        this.Board.ActiveObjects.forEach((ele) => {
+                            ele.move(context, { x: offsetX - x, y: offsetY - y }, "move", false);
+                        });
                     } else if (
                         this.Board._currentCanvasAction == CanvasActionEnum.Resize &&
                         this.Board.CursorPosition
@@ -289,10 +299,11 @@ export class EventManager {
                     this.Board.unSelectElements();
                     return;
                 }
+                this.Board._applySelectionStyle = false;
                 // Uncomment if individual selection is required
-                // this.Board.SelectedElements.forEach((ele) => {
-                //     ele.select(ele.getValues());
-                // });
+                this.Board.SelectedElements.forEach((ele) => {
+                    ele.select(ele.getValues());
+                });
                 const selectedAreaBoundary = CanvasHelper.getSelectedAreaBoundary(this.Board.SelectedElements);
                 this.Board._tempSelectionArea.update(
                     context,

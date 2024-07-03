@@ -40,7 +40,7 @@ export interface ICanvasObjectMethods {
         key: T,
         value: IObjectStyle[T]
     ) => unknown;
-    move: (ctx: CanvasRenderingContext2D, position: Position, action: MouseAction) => unknown;
+    move: (ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas?: boolean) => unknown;
     toSVG: (options: IToSVGOptions) => string;
     getValues: () => CanvasObject;
     select: (cords: Partial<IObjectValue>) => unknown;

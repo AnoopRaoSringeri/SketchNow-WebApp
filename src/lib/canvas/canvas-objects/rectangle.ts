@@ -45,7 +45,7 @@ export class Rectangle implements ICanvasObjectWithId {
 
     select({ x = this.x, y = this.y, h = this.h, w = this.w }: Partial<IObjectValue>) {
         this._isSelected = true;
-        if (this._parent.CanvasCopy) {
+        if (this._parent.CanvasCopy && this._parent._applySelectionStyle) {
             const copyCtx = this._parent.CanvasCopy.getContext("2d");
             if (copyCtx) {
                 CanvasHelper.applySelection(copyCtx, { height: h, width: w, x, y });
@@ -105,12 +105,14 @@ export class Rectangle implements ICanvasObjectWithId {
         ctx.fillRect(this.x, this.y, this.w, this.h);
     }
 
-    move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction) {
+    move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
         if (action == "down") {
             CanvasHelper.applyStyles(ctx, this.style);
         }
-        CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+        if (clearCanvas) {
+            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+        }
         const offsetX = x + this.x;
         const offsetY = y + this.y;
         ctx.strokeRect(offsetX, offsetY, this.w, this.h);
