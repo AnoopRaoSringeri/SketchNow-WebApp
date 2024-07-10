@@ -249,7 +249,6 @@ export class CanvasBoard implements ICanvas {
 
     createBoard({ height = window.innerHeight, width = window.innerWidth }: Partial<AdditionalCanvasOptions>) {
         CanvasWorker = CanvasHelper.GetCanvasWorker();
-
         this.Height = height;
         this.Width = width;
     }
@@ -386,11 +385,19 @@ export class CanvasBoard implements ICanvas {
 
     saveBoard() {
         if (this._activeObjects.length > 0) {
-            this._elements.push(...this._activeObjects);
-            this._pointerOrigin = null;
-            this._activeObjects = [];
-            this._hoveredObject = null;
-            this.redrawBoard();
+            if (this.SelectionElement) {
+                this._elements.push(...this._activeObjects);
+                this._pointerOrigin = null;
+                this._activeObjects = [];
+                this._hoveredObject = null;
+                this.redrawBoard();
+            } else {
+                this._elements.push(...this._activeObjects);
+                this._pointerOrigin = null;
+                this._activeObjects = [];
+                this._hoveredObject = null;
+                this.redrawBoard();
+            }
         }
     }
 

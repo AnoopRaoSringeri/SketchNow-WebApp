@@ -10,6 +10,7 @@ import {
     IObjectValue,
     IToSVGOptions,
     MouseAction,
+    ObjectOptions,
     PartialCanvasObject
 } from "@/types/custom-canvas";
 
@@ -34,6 +35,7 @@ export class Rectangle implements ICanvasObjectWithId {
     h = 0;
     w = 0;
     private _isSelected = false;
+    private _showSelection = false;
 
     get IsSelected() {
         return this._isSelected;
@@ -43,9 +45,17 @@ export class Rectangle implements ICanvasObjectWithId {
         return this.style;
     }
 
+    get ShowSelection() {
+        return this._showSelection;
+    }
+
+    set ShowSelection(value: boolean) {
+        this._showSelection = value;
+    }
+
     select({ x = this.x, y = this.y, h = this.h, w = this.w }: Partial<IObjectValue>) {
         this._isSelected = true;
-        if (this._parent.CanvasCopy && this._parent._applySelectionStyle) {
+        if (this._parent.CanvasCopy && this._showSelection) {
             const copyCtx = this._parent.CanvasCopy.getContext("2d");
             if (copyCtx) {
                 CanvasHelper.applySelection(copyCtx, { height: h, width: w, x, y });
@@ -55,6 +65,7 @@ export class Rectangle implements ICanvasObjectWithId {
 
     unSelect() {
         this._isSelected = false;
+        this._showSelection = false;
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -73,9 +84,7 @@ export class Rectangle implements ICanvasObjectWithId {
 
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
         let { h = this.h, w = this.w, x = this.x, y = this.y } = objectValue;
-        if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
-        }
+        CanvasHelper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         }
@@ -89,6 +98,7 @@ export class Rectangle implements ICanvasObjectWithId {
         }
         ctx.strokeRect(x, y, w, h);
         ctx.fillRect(x, y, w, h);
+        ctx.restore();
         if (action == "up") {
             this.h = h;
             this.w = w;
@@ -107,9 +117,7 @@ export class Rectangle implements ICanvasObjectWithId {
 
     move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
-        if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
-        }
+        CanvasHelper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         }
@@ -118,18 +126,19 @@ export class Rectangle implements ICanvasObjectWithId {
         ctx.strokeRect(offsetX, offsetY, this.w, this.h);
         ctx.fillRect(offsetX, offsetY, this.w, this.h);
         this.select({ x: offsetX, y: offsetY });
+        ctx.restore();
         if (action == "up") {
             this.x = offsetX;
             this.y = offsetY;
         }
     }
 
-    resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction) {
+    resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction, clearCanvas = true) {
         const { dx, dy } = delta;
-        if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
+        CanvasHelper.applyStyles(ctx, this.style);
+        if (clearCanvas) {
+            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         }
-        CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         let w = dx;
         let h = dy;
         let y = this.y;
@@ -212,6 +221,8 @@ export class Rectangle implements ICanvasObjectWithId {
         }
         ctx.strokeRect(x, y, w, h);
         ctx.fillRect(x, y, w, h);
+        ctx.restore();
+
         this.select({ h, w, x, y });
         if (action == "up") {
             this.h = h;
@@ -219,6 +230,7 @@ export class Rectangle implements ICanvasObjectWithId {
             this.x = x;
             this.y = y;
         }
+        return { x, y, h, w };
     }
 
     getValues() {
@@ -231,6 +243,10 @@ export class Rectangle implements ICanvasObjectWithId {
             y: this.y,
             style: this.style
         };
+    }
+
+    set<T extends keyof ObjectOptions>(key: T, value: ObjectOptions[T]) {
+        this[key] = value;
     }
 
     getPosition() {

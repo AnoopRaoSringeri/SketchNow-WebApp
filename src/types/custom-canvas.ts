@@ -49,13 +49,18 @@ export interface ICanvasObjectMethods {
         ctx: CanvasRenderingContext2D,
         delta: Delta,
         curorPosition: CursorPosition,
-        action: MouseAction
-    ) => unknown;
+        action: MouseAction,
+        clearCanvas?: boolean
+    ) => Position & { h: number; w: number };
     getPosition: () => Position & AbsPosition;
+    set: <T extends keyof ObjectOptions>(key: T, value: ObjectOptions[T]) => unknown;
 }
-export interface ICanvasObject extends Partial<IObjectValue>, ICanvasObjectMethods {
-    type: ElementEnum;
+export interface ObjectOptions {
     IsSelected: boolean;
+    ShowSelection: boolean;
+}
+export interface ICanvasObject extends Partial<IObjectValue>, ICanvasObjectMethods, ObjectOptions {
+    type: ElementEnum;
     readonly _parent: CanvasBoard;
 }
 

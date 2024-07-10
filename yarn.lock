@@ -2805,10 +2805,10 @@ lru-cache@^6.0.0:
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-10.2.0.tgz#0bd445ca57363465900f4d1f9bd8db343a4d95c3"
   integrity sha512-2bIM8x+VAf6JT4bKAljS1qUWgMsqZRPGJS6FSahIMPVvctcNhyVp7AJu7quxOW9jwkryBReKZY5tY5JYv2n/7Q==
 
-lucide-react@^0.379.0:
-  version "0.379.0"
-  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.379.0.tgz#29e34eeffae7fb241b64b09868cbe3ab888ef7cc"
-  integrity sha512-KcdeVPqmhRldldAAgptb8FjIunM2x2Zy26ZBh1RsEUcdLIvsEmbcw7KpzFYUy5BbpGeWhPu9Z9J5YXfStiXwhg==
+lucide-react@^0.403.0:
+  version "0.403.0"
+  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.403.0.tgz#453a48bb59261f7d925c2f8553bdbb0bd1648dce"
+  integrity sha512-ldD3NT444k4Mi+n+43xC8XaHr88MNdhOIApIE15r7O+PcVYEBXNOOFo904cBC6Hsja+zHc1lqw0mqUgBECeisw==
 
 match-sorter@^6.0.2:
   version "6.3.4"
