@@ -395,6 +395,7 @@ export class CanvasBoard implements ICanvas {
             if (this.SelectionElement) {
                 this._elements.push(...this._activeObjects);
                 this._pointerOrigin = null;
+                this.SelectedElements = this._activeObjects;
                 this._activeObjects = [];
                 this._hoveredObject = null;
                 this.redrawBoard();
