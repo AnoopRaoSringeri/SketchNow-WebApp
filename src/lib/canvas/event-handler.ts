@@ -59,6 +59,7 @@ export class EventManager {
                             ao.move(context, { x: 0, y: 0 }, "down");
                         });
                     }
+                    this.Board._currentCanvasAction = CanvasActionEnum.Select;
                 } else {
                     CanvasHelper.clearCanvasArea(context, this.Board.Transform);
                     if (this.Board.SelectionElement) {
@@ -210,12 +211,14 @@ export class EventManager {
                             let uy = 0;
                             switch (cp) {
                                 case "br":
+                                case "tr":
                                     ox = ((ex - rx) * rw) / pw;
                                     oy = ((ey - ry) * rh) / ph;
                                     ux = px + ox;
                                     uy = py + oy;
                                     break;
                                 case "tl":
+                                case "bl":
                                     ox = ((ex - px) * rw) / pw;
                                     oy = ((ey - py) * rh) / ph;
                                     ux = rx + ox;
@@ -237,6 +240,7 @@ export class EventManager {
                             );
                         });
                     } else {
+                        this.Board._currentCanvasAction = CanvasActionEnum.Move;
                         this.Board.SelectedElements = [];
                         this.Board.ActiveObjects.forEach((ao) => {
                             ao.move(context, { x: offsetX - x, y: offsetY - y }, "move");
@@ -362,12 +366,14 @@ export class EventManager {
                     let uy = 0;
                     switch (cp) {
                         case "br":
+                        case "tr":
                             ox = ((ex - rx) * rw) / pw;
                             oy = ((ey - ry) * rh) / ph;
                             ux = px + ox;
                             uy = py + oy;
                             break;
                         case "tl":
+                        case "bl":
                             ox = ((ex - px) * rw) / pw;
                             oy = ((ey - py) * rh) / ph;
                             ux = rx + ox;
@@ -427,6 +433,11 @@ export class EventManager {
                 if (this.Board._currentCanvasAction == CanvasActionEnum.Resize) {
                     this.Board.ActiveObjects.forEach((ao) => {
                         ao.resize(context, { dx: offsetX - x, dy: offsetY - y }, this.Board.CursorPosition!, "up");
+                    });
+                } else if (this.Board._currentCanvasAction == CanvasActionEnum.Select) {
+                    this.Board.ActiveObjects.forEach((ao) => {
+                        ao.select(ao.getValues());
+                        ao.set("ShowSelection", true);
                     });
                 } else {
                     this.Board.ActiveObjects.forEach((ao) => {

@@ -37,7 +37,7 @@ class SketchStore {
         try {
             const { data }: AxiosResponse<SavedCanvas> = await axios.post(
                 `${BaseUrl}create`,
-                { name, metadata: sketchMetadata, createdBy: "abc" },
+                { name, metadata: sketchMetadata },
                 getRequestConfig(true)
             );
             return data;
@@ -48,11 +48,7 @@ class SketchStore {
 
     async UpdateSketch(id: string, sketchMetadata: CanvasMetadata, name: string): Promise<boolean> {
         try {
-            await axios.post(
-                `${BaseUrl}update/${id}`,
-                { name, metadata: sketchMetadata, createdBy: "abc" },
-                getRequestConfig(true)
-            );
+            await axios.post(`${BaseUrl}update/${id}`, { name, metadata: sketchMetadata }, getRequestConfig(true));
             return true;
         } catch (e) {
             return false;

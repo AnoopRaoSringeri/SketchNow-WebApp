@@ -33,9 +33,29 @@ export class Line implements ICanvasObjectWithId {
     x = 0;
     y = 0;
     private _isSelected = false;
+    private _showSelection = false;
+    _isDragging = false;
 
     get IsSelected() {
         return this._isSelected;
+    }
+    get IsDragging() {
+        return this._isDragging;
+    }
+
+    set IsDragging(value: boolean) {
+        this._isDragging = value;
+    }
+    get ShowSelection() {
+        return this._showSelection;
+    }
+
+    set ShowSelection(value: boolean) {
+        this._showSelection = value;
+    }
+
+    get Style() {
+        return this.style;
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -154,6 +174,7 @@ export class Line implements ICanvasObjectWithId {
         console.log(key, value);
     }
     resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction) {
-        console.log(delta, cPos, action);
+        console.log(action);
+        return { x: 0, y: 0, h: 0, w: 0 };
     }
 }

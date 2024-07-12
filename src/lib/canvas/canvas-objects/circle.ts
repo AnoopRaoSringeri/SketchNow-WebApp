@@ -5,12 +5,12 @@ import { Delta, Position } from "@/types/canvas";
 import {
     CursorPosition,
     ElementEnum,
-    ICanvasObject,
     ICanvasObjectWithId,
     IObjectStyle,
     IObjectValue,
     IToSVGOptions,
     MouseAction,
+    ObjectOptions,
     PartialCanvasObject
 } from "@/types/custom-canvas";
 
@@ -40,9 +40,29 @@ export class Circle implements ICanvasObjectWithId {
     ro = 0;
     ea = 2 * Math.PI;
     private _isSelected = false;
+    private _showSelection = false;
+    _isDragging = false;
 
     get IsSelected() {
         return this._isSelected;
+    }
+    get IsDragging() {
+        return this._isDragging;
+    }
+
+    set IsDragging(value: boolean) {
+        this._isDragging = value;
+    }
+    get ShowSelection() {
+        return this._showSelection;
+    }
+
+    set ShowSelection(value: boolean) {
+        this._showSelection = value;
+    }
+
+    get Style() {
+        return this.style;
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -62,7 +82,7 @@ export class Circle implements ICanvasObjectWithId {
 
     select({ x = this.x, y = this.y, w = this.w, h = this.h }: Partial<IObjectValue>) {
         this._isSelected = true;
-        if (this._parent.CanvasCopy) {
+        if (this._parent.CanvasCopy && this._isSelected) {
             const copyCtx = this._parent.CanvasCopy.getContext("2d");
             if (copyCtx) {
                 CanvasHelper.applySelection(copyCtx, { height: h, width: w, x, y });
@@ -72,6 +92,7 @@ export class Circle implements ICanvasObjectWithId {
 
     unSelect() {
         this._isSelected = false;
+        this._showSelection = false;
     }
 
     getPosition() {
@@ -98,6 +119,7 @@ export class Circle implements ICanvasObjectWithId {
         ctx.stroke();
         ctx.fill();
         ctx.closePath();
+        ctx.restore();
         if (action === "up") {
             this.h = h;
             this.w = w;
@@ -117,11 +139,13 @@ export class Circle implements ICanvasObjectWithId {
         ctx.fill();
     }
 
-    move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction) {
+    move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
-        if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
+        CanvasHelper.applyStyles(ctx, this.style);
+        if (clearCanvas) {
+            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         }
+        this.IsDragging = true;
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
         const offsetX = x + this.x;
         const offsetY = y + this.y;
@@ -141,6 +165,7 @@ export class Circle implements ICanvasObjectWithId {
             ctx.restore();
             this.x = offsetX;
             this.y = offsetY;
+            this.IsDragging = false;
         }
     }
 
@@ -167,15 +192,18 @@ export class Circle implements ICanvasObjectWithId {
 
     delete() {}
     onSelect() {}
-    set<T extends keyof ICanvasObject>(key: T, value: ICanvasObject[T]) {
-        console.log(key, value);
+
+    set<T extends keyof ObjectOptions>(key: T, value: ObjectOptions[T]) {
+        this[key] = value;
     }
-    resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction) {
+
+    resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction, clearCanvas = true) {
         const { dx, dy } = delta;
-        if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
+        CanvasHelper.applyStyles(ctx, this.style);
+
+        if (clearCanvas) {
+            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         }
-        CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         let w = dx;
         let h = dy;
         let y = this.y;
@@ -260,6 +288,8 @@ export class Circle implements ICanvasObjectWithId {
         ctx.beginPath();
         ctx.ellipse(ax, ay, rX, rY, this.ro, this.sa, this.ea);
         ctx.stroke();
+        ctx.restore();
+
         this.select({ h, w, x, y });
         if (action == "up") {
             this.h = h;
@@ -267,5 +297,7 @@ export class Circle implements ICanvasObjectWithId {
             this.x = x;
             this.y = y;
         }
+
+        return { x, y, h, w };
     }
 }

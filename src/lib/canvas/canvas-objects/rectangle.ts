@@ -1,3 +1,4 @@
+import { computed, makeObservable, observable } from "mobx";
 import { v4 as uuid } from "uuid";
 
 import { CanvasHelper, DefaultStyle } from "@/lib/canvas-helpers";
@@ -29,6 +30,10 @@ export class Rectangle implements ICanvasObjectWithId {
         this.id = id;
         this.style = { ...(style ?? DefaultStyle) };
         this._parent = parent;
+        makeObservable(this, {
+            _isDragging: observable,
+            IsDragging: computed
+        });
     }
     x = 0;
     y = 0;
@@ -36,9 +41,18 @@ export class Rectangle implements ICanvasObjectWithId {
     w = 0;
     private _isSelected = false;
     private _showSelection = false;
+    _isDragging = false;
 
     get IsSelected() {
         return this._isSelected;
+    }
+
+    get IsDragging() {
+        return this._isDragging;
+    }
+
+    set IsDragging(value: boolean) {
+        this._isDragging = value;
     }
 
     get Style() {
@@ -121,6 +135,7 @@ export class Rectangle implements ICanvasObjectWithId {
         if (clearCanvas) {
             CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         }
+        this.IsDragging = true;
         const offsetX = x + this.x;
         const offsetY = y + this.y;
         ctx.strokeRect(offsetX, offsetY, this.w, this.h);
@@ -130,6 +145,7 @@ export class Rectangle implements ICanvasObjectWithId {
         if (action == "up") {
             this.x = offsetX;
             this.y = offsetY;
+            this.IsDragging = false;
         }
     }
 
@@ -139,6 +155,7 @@ export class Rectangle implements ICanvasObjectWithId {
         if (clearCanvas) {
             CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         }
+        this.IsDragging = true;
         let w = dx;
         let h = dy;
         let y = this.y;
@@ -229,6 +246,7 @@ export class Rectangle implements ICanvasObjectWithId {
             this.w = w;
             this.x = x;
             this.y = y;
+            this.IsDragging = false;
         }
         return { x, y, h, w };
     }

@@ -57,6 +57,7 @@ export interface ICanvasObjectMethods {
 }
 export interface ObjectOptions {
     IsSelected: boolean;
+    IsDragging: boolean;
     ShowSelection: boolean;
 }
 export interface ICanvasObject extends Partial<IObjectValue>, ICanvasObjectMethods, ObjectOptions {

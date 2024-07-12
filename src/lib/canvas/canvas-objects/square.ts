@@ -10,6 +10,7 @@ import {
     IObjectValue,
     IToSVGOptions,
     MouseAction,
+    ObjectOptions,
     PartialCanvasObject
 } from "@/types/custom-canvas";
 
@@ -31,16 +32,37 @@ export class Square implements ICanvasObjectWithId {
     x = 0;
     y = 0;
     h = 0;
-
     private _isSelected = false;
+    private _showSelection = false;
+    _isDragging = false;
 
     get IsSelected() {
         return this._isSelected;
     }
 
+    get IsDragging() {
+        return this._isDragging;
+    }
+
+    set IsDragging(value: boolean) {
+        this._isDragging = value;
+    }
+
+    get Style() {
+        return this.style;
+    }
+
+    get ShowSelection() {
+        return this._showSelection;
+    }
+
+    set ShowSelection(value: boolean) {
+        this._showSelection = value;
+    }
+
     select({ x = this.x, y = this.y, h = this.h, w = this.h }: Partial<IObjectValue>) {
         this._isSelected = true;
-        if (this._parent.CanvasCopy) {
+        if (this._parent.CanvasCopy && this._showSelection) {
             const copyCtx = this._parent.CanvasCopy.getContext("2d");
             if (copyCtx) {
                 CanvasHelper.applySelection(copyCtx, { height: h, width: w, x, y });
@@ -50,6 +72,7 @@ export class Square implements ICanvasObjectWithId {
 
     unSelect() {
         this._isSelected = false;
+        this._showSelection = false;
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -68,9 +91,8 @@ export class Square implements ICanvasObjectWithId {
 
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
         let { h = this.h, w = this.h, x = this.x, y = this.y } = objectValue;
-        if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
-        }
+        CanvasHelper.applyStyles(ctx, this.style);
+
         if (clearCanvas) {
             CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         }
@@ -85,6 +107,7 @@ export class Square implements ICanvasObjectWithId {
         const side = Math.min(h, w);
         ctx.strokeRect(x, y, side, side);
         ctx.fillRect(x, y, side, side);
+        ctx.restore();
         if (action == "up") {
             this.h = side;
             this.x = x;
@@ -100,30 +123,33 @@ export class Square implements ICanvasObjectWithId {
         ctx.fillRect(this.x, this.y, this.h, this.h);
     }
 
-    move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction) {
+    move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
-        if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
+        CanvasHelper.applyStyles(ctx, this.style);
+        if (clearCanvas) {
+            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         }
-        CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        this.IsDragging = true;
         const offsetX = x + this.x;
         const offsetY = y + this.y;
         ctx.strokeRect(offsetX, offsetY, this.h, this.h);
         ctx.fillRect(offsetX, offsetY, this.h, this.h);
         this.select({ x: offsetX, y: offsetY });
+        ctx.restore();
         if (action == "up") {
             this.x = offsetX;
             this.y = offsetY;
+            this.IsDragging = false;
         }
     }
 
-    resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction) {
+    resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction, clearCanvas = true) {
         const { dx, dy } = delta;
-        if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
+        CanvasHelper.applyStyles(ctx, this.style);
+        if (clearCanvas) {
+            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
         }
-        CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+        this.IsDragging = true;
         let w = dx;
         let h = dy;
         let y = this.y;
@@ -207,12 +233,20 @@ export class Square implements ICanvasObjectWithId {
         const side = Math.min(w, h);
         ctx.strokeRect(x, y, side, side);
         ctx.fillRect(x, y, side, side);
+        ctx.restore();
+
         this.select({ h: side, w: side, x, y });
         if (action == "up") {
             this.h = side;
             this.x = x;
             this.y = y;
+            this.IsDragging = false;
         }
+        return { x, y, h, w };
+    }
+
+    set<T extends keyof ObjectOptions>(key: T, value: ObjectOptions[T]) {
+        this[key] = value;
     }
 
     getValues() {

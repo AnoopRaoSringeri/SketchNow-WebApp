@@ -63,7 +63,33 @@ export class Pencil implements ICanvasObjectWithId {
         this.style = { ...(v.style ?? DefaultStyle) };
         this._parent = parent;
     }
+    points: [number, number][] = [];
 
+    private _isSelected = false;
+    private _showSelection = false;
+    _isDragging = false;
+
+    get IsSelected() {
+        return this._isSelected;
+    }
+    get IsDragging() {
+        return this._isDragging;
+    }
+
+    set IsDragging(value: boolean) {
+        this._isDragging = value;
+    }
+    get ShowSelection() {
+        return this._showSelection;
+    }
+
+    set ShowSelection(value: boolean) {
+        this._showSelection = value;
+    }
+
+    get Style() {
+        return this.style;
+    }
     select({ points = this.points }: Partial<IObjectValue>) {
         this._isSelected = true;
         let x = Number.POSITIVE_INFINITY;
@@ -92,13 +118,6 @@ export class Pencil implements ICanvasObjectWithId {
 
     getPosition() {
         return CanvasHelper.getAbsolutePosition({ x: 0, y: 0 }, this._parent.Transform);
-    }
-
-    points: [number, number][] = [];
-    private _isSelected = false;
-
-    get IsSelected() {
-        return this._isSelected;
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -215,5 +234,6 @@ export class Pencil implements ICanvasObjectWithId {
     }
     resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction) {
         console.log(action);
+        return { x: 0, y: 0, h: 0, w: 0 };
     }
 }

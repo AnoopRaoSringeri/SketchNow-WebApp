@@ -106,6 +106,13 @@ export class CanvasBoard implements ICanvas {
         this._elementType = type;
         this._activeObjects = [];
         this.unSelectElements();
+        if (this.CanvasCopy) {
+            if (type == ElementEnum.Pencil) {
+                this.CanvasCopy.style.cursor = "crosshair";
+            } else {
+                this.CanvasCopy.style.cursor = "default";
+            }
+        }
     }
 
     get Height() {

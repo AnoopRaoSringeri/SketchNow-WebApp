@@ -9,7 +9,7 @@ export const SelectionOptions = observer(function SelectionOptions() {
     const { id } = useParams<{ id: string }>();
     const { canvasBoard } = useCanvas(id ?? "new");
     const element = canvasBoard.SelectionElement;
-    if (!element) {
+    if (!element || element.IsDragging) {
         return <></>;
     }
     const { ax, ay } = element.getPosition();
