@@ -1,4 +1,3 @@
-import { User } from "lucide-react";
 import { observer } from "mobx-react";
 import { useEffect } from "react";
 import { Outlet } from "react-router";
@@ -13,6 +12,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import Icon from "@/components/ui/icon";
 import { Image } from "@/components/ui/image";
 import { LayoutToggle } from "@/components/ui/layout-toggle";
 import { ModeToggle } from "@/components/ui/mode-toggle";
@@ -22,7 +22,11 @@ import { cn } from "@/lib/utils";
 
 // "absolute  top-0 z-50 w-full border-b border-border/40 bg-background/95 opacity-0 backdrop-blur transition-all hover:sticky hover:opacity-100 supports-[backdrop-filter]:bg-background/60";
 
-export const AppShellPrimary = observer(function AppShell2() {
+export const AppShellPrimary = observer(function AppShell2({
+    initiallyVisible = true
+}: {
+    initiallyVisible?: boolean;
+}) {
     const { logOut, refreshToken } = useAuth();
 
     useEffect(() => {
@@ -30,7 +34,15 @@ export const AppShellPrimary = observer(function AppShell2() {
     }, []);
     return (
         <div className="relative flex h-screen w-screen flex-col overflow-hidden bg-background">
-            <header className="sticky top-0 z-50 h-[56px] w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <header
+                className={cn(
+                    "sticky top-0 z-50 h-[56px] w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+                    initiallyVisible
+                        ? ""
+                        : "absolute  top-0 z-50 h-0 w-full border-b border-border/40 bg-background/95 opacity-0 backdrop-blur transition-all duration-200 hover:sticky hover:h-[56px] hover:opacity-100 supports-[backdrop-filter]:bg-background/60"
+                )}
+            >
+                {/* <header className="sticky top-0 z-50 h-[56px] w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"> */}
                 <div className="container flex h-14 max-w-screen-2xl items-center">
                     <div className="mr-4 hidden md:flex">
                         <a className="mr-6 flex items-center space-x-2">
@@ -99,7 +111,7 @@ export const AppShellPrimary = observer(function AppShell2() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="simple" size="icon">
-                                    <User />
+                                    <Icon name="User" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">

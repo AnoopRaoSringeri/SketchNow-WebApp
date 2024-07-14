@@ -5,17 +5,26 @@ import { useParams } from "react-router";
 import { useStore } from "@/api-stores/store-provider";
 import { OptionsWrapper } from "@/components/mini-components/options-wrapper";
 import { Loader } from "@/components/ui/loader";
+import { useLayout } from "@/hooks/layout-provider";
 import { useCanvas } from "@/hooks/use-canvas";
 
 import CanvasOptions from "./canvas-options";
 
 export const CanvasBoard = observer(function CanvasBoard() {
+    const { setInitiallyVisible } = useLayout();
     const { id } = useParams<{ id: string }>();
     const [sketchName, setSketchName] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const { sketchStore } = useStore();
     const { canvasBoard } = useCanvas(id ?? "new");
     const canvas = canvasBoard.CanvasRef;
+
+    useEffect(() => {
+        setInitiallyVisible(false);
+        return () => {
+            setInitiallyVisible(true);
+        };
+    }, []);
 
     useEffect(() => {
         if (id && id != "new") {

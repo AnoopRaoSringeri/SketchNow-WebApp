@@ -145,8 +145,8 @@ export class EventManager {
                 const { offsetX, offsetY } = e;
                 const dx = offsetX - x;
                 const dy = offsetY - y;
-                this.Board.Transform.e += dx;
-                this.Board.Transform.f += dy;
+                const { e: pe, f: pf } = this.Board.Transform;
+                this.Board.Transform = { ...this.Board.Transform, e: pe + dx, f: pf + dy };
                 this.Board.PointerOrigin = { x: offsetX, y: offsetY };
                 this.Board.redrawBoard();
             } else if (this.Board.ElementType == ElementEnum.Move) {

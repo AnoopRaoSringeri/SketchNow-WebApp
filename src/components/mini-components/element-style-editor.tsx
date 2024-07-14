@@ -1,13 +1,58 @@
-import { PaintBucket, Palette, PencilLine } from "lucide-react";
 import { observer } from "mobx-react";
+import { TwitterPicker } from "react-color";
+import { TwitterPickerStylesProps } from "react-color/lib/components/twitter/Twitter";
 import { useParams } from "react-router";
 
-import { ColorPickerControl } from "@/components/ui/color-picker-control";
-import { Popover, PopoverContent, PopoverTriggerButton } from "@/components/ui/popover";
+import Icon from "@/components/ui/icon";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
 import { useCanvas } from "@/hooks/use-canvas";
 
-export const ElemntStyleEditor = observer(function ElemntStyleEditor() {
+const SWATCHES = [
+    "#FF6900",
+    "#FCB900",
+    "#7BDCB5",
+    "#00D084",
+    "#8ED1FC",
+    "#0693E3",
+    "#ABB8C3",
+    "#EB144C",
+    "#9900EF",
+    "transparent"
+];
+
+const twitterStyle: { default: Partial<TwitterPickerStylesProps> } = {
+    default: {
+        input: {
+            display: "none"
+        },
+        hash: {
+            display: "none"
+        },
+        card: {
+            background: "transparent"
+        },
+        swatch: {
+            padding: 0,
+            margin: 0
+        },
+        body: {
+            padding: 0,
+            margin: 0,
+            background: "transparent",
+            boxShadow: "none",
+            display: "flex",
+            gap: 4,
+            flexWrap: "wrap",
+            border: "none"
+        }
+    }
+};
+
+const twitterStyleSingle: { default: Partial<TwitterPickerStylesProps> } = { default: { ...twitterStyle.default } };
+
+export const ElementStyleEditor = observer(function ElemntStyleEditor() {
     const { id } = useParams<{ id: string }>();
     const { canvasBoard } = useCanvas(id ?? "new");
     const selectedElements = canvasBoard.SelectedElements;
@@ -19,54 +64,64 @@ export const ElemntStyleEditor = observer(function ElemntStyleEditor() {
     }
 
     return (
-        <div className="absolute right-5 top-20 z-[100] flex flex-col items-center gap-1">
-            <Popover>
-                <PopoverTriggerButton variant="secondary" size="sm">
-                    <PencilLine />
-                </PopoverTriggerButton>
-                <PopoverContent align="end" alignOffset={120} sideOffset={-38}>
+        <div className="absolute left-5 top-20 z-[100]  flex  flex-row items-center gap-1">
+            <ScrollArea>
+                <div className="flex h-full w-[260px] flex-col gap-4 rounded-sm bg-slate-500 p-5">
+                    <Label className="text-sm">Storke width</Label>
                     <Slider
-                        value={[elementStyle.strokeWidth]}
+                        value={[elementStyle.strokeWidth ?? 0]}
                         onValueChange={(values) => {
                             canvasBoard.updateStyle("strokeWidth", values[0]);
                         }}
                     />
-                </PopoverContent>
-            </Popover>
-            <Popover>
-                <PopoverTriggerButton variant="secondary" size="sm">
-                    <Palette color={elementStyle.strokeStyle} />
-                </PopoverTriggerButton>
-                <PopoverContent>
-                    <ColorPickerControl
-                        value={elementStyle.strokeStyle}
-                        onChange={(c) => {
-                            if (c.endsWith("00")) {
-                                canvasBoard.updateStyle("strokeStyle", c.slice(0, -2));
-                            } else {
-                                canvasBoard.updateStyle("strokeStyle", c);
-                            }
-                        }}
-                    />
-                </PopoverContent>
-            </Popover>
-            <Popover>
-                <PopoverTriggerButton variant="secondary" size="sm">
-                    <PaintBucket color={elementStyle.fillColor} />
-                </PopoverTriggerButton>
-                <PopoverContent>
-                    <ColorPickerControl
-                        value={elementStyle.fillColor}
-                        onChange={(c) => {
-                            if (c.endsWith("00")) {
-                                canvasBoard.updateStyle("fillColor", c.slice(0, -2));
-                            } else {
-                                canvasBoard.updateStyle("fillColor", c);
-                            }
-                        }}
-                    />
-                </PopoverContent>
-            </Popover>
+                    <div>
+                        <Label className="text-sm">Stroke</Label>
+                        <div className="flex gap-[5]">
+                            <TwitterPicker
+                                colors={SWATCHES}
+                                styles={twitterStyle}
+                                className="!w-full !border-none !shadow-none"
+                                triangle="hide"
+                                color={elementStyle.strokeStyle}
+                                onChange={(col) => {
+                                    canvasBoard.updateStyle("strokeStyle", col.hex);
+                                }}
+                            />
+                            <Icon name="Minus" className="rotate-90" size="30px" />
+                            <TwitterPicker
+                                width="40px"
+                                className="!border-none !shadow-none"
+                                styles={twitterStyleSingle}
+                                triangle="hide"
+                                colors={[elementStyle.strokeStyle]}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <Label className="text-sm">Background</Label>
+                        <div className="flex gap-[5]">
+                            <TwitterPicker
+                                colors={SWATCHES}
+                                styles={twitterStyle}
+                                className="!w-full !border-none !shadow-none"
+                                triangle="hide"
+                                color={elementStyle.fillColor}
+                                onChange={(col) => {
+                                    canvasBoard.updateStyle("fillColor", col.hex);
+                                }}
+                            />
+                            <Icon name="Minus" className="rotate-90" size="30px" />
+                            <TwitterPicker
+                                width="40px"
+                                className="!border-none !shadow-none"
+                                styles={twitterStyleSingle}
+                                triangle="hide"
+                                colors={[elementStyle.fillColor]}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </ScrollArea>
         </div>
     );
 });

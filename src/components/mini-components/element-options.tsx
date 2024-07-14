@@ -1,8 +1,8 @@
-import { Copy, Trash2 } from "lucide-react";
 import { observer } from "mobx-react";
 import { useParams } from "react-router";
 
 import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/icon";
 import { useCanvas } from "@/hooks/use-canvas";
 
 export const ElementOptions = observer(function ElementOptions() {
@@ -27,10 +27,10 @@ export const ElementOptions = observer(function ElementOptions() {
     return (
         <div className="absolute z-[100] flex " style={{ top: ay - 30, left: ax + w * canvasBoard.Transform.a - 68 }}>
             <Button size="xs" variant="ghost" onClick={copyElement}>
-                <Copy size={20} />
+                <Icon name="Copy" size={20} />
             </Button>
             <Button size="xs" variant="destructive" onClick={removeElement}>
-                <Trash2 size={20} />
+                <Icon name="Trash2" size={20} />
             </Button>
         </div>
     );

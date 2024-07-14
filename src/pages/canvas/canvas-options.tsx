@@ -1,4 +1,4 @@
-import { Circle, Minus, Move, Pencil, RectangleHorizontal, Save, Square } from "lucide-react";
+import { Save } from "lucide-react";
 import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { useStore } from "@/api-stores/store-provider";
 import { CanvasStyleEditor } from "@/components/mini-components/canvas-style-editor";
-import { ElemntStyleEditor } from "@/components/mini-components/element-style-editor";
+import { ElementStyleEditor } from "@/components/mini-components/element-style-editor";
 import { ZoomController } from "@/components/mini-components/zoom-controller";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,12 +17,12 @@ import { Option } from "@/types/layout";
 import ElementSelector from "./element-selector";
 
 const LeftOptionLists: Option[] = [
-    { icon: Move, value: ElementEnum.Move },
-    { icon: Pencil, value: ElementEnum.Pencil },
-    { icon: RectangleHorizontal, value: ElementEnum.Rectangle },
-    { icon: Circle, value: ElementEnum.Circle },
-    { icon: Square, value: ElementEnum.Square },
-    { icon: Minus, value: ElementEnum.Line }
+    { icon: "Move", value: ElementEnum.Move },
+    { icon: "Pencil", value: ElementEnum.Pencil },
+    { icon: "RectangleHorizontal", value: ElementEnum.Rectangle },
+    { icon: "Circle", value: ElementEnum.Circle },
+    { icon: "Square", value: ElementEnum.Square },
+    { icon: "Minus", value: ElementEnum.Line }
 ];
 
 const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }) {
@@ -74,7 +74,7 @@ const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }
                     </div>
                 </div>
                 <CanvasStyleEditor />
-                <ElemntStyleEditor />
+                <ElementStyleEditor />
                 <ZoomController />
             </div>
         </div>

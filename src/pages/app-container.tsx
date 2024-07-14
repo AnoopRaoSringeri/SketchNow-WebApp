@@ -61,6 +61,14 @@ function AppContainer() {
                         }
                     />
                 </Route>
+                {/* <Route
+                    path="/sketch/:id"
+                    element={
+                        <Suspense fallback={<Loader />}>
+                            <CanvasBoard />
+                        </Suspense>
+                    }
+                /> */}
             </Routes>
         </HashRouter>
     );

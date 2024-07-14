@@ -19,7 +19,7 @@ export const GUTTER = 2;
 export const SELECTOR_POINT_RADIUS = 5;
 
 export const CANVAS_SCALING_FACTOR = 0.0001;
-export const CANVAS_SCALING_LIMIT = 0.00001;
+export const CANVAS_SCALING_LIMIT = 0.001;
 export const CANVAS_SCALING_MULTIPLIER = 100;
 export const CANVAS_ZOOM_IN_OUT_FACTOR = 0.05;
 
@@ -269,7 +269,7 @@ export class CanvasHelper {
     ) {
         const xf = (Math.abs(e) * (a + 1)) / a;
         const yf = (Math.abs(f) * (a + 1)) / a;
-        ctx.clearRect(-xf, -yf, window.innerWidth + xf * 2, window.innerHeight + yf * 2);
+        ctx.clearRect(-xf, -yf, window.innerWidth / a + xf, window.innerHeight / a + yf);
     }
 
     static getCanvasBoundary(

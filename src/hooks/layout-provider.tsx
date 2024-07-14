@@ -15,12 +15,14 @@ type LayoutProviderState = {
     layout: Layout;
     setLayout: (layout: Layout) => void;
     element: JSX.Element;
+    setInitiallyVisible: (visible: boolean) => void;
 };
 
 const initialState: LayoutProviderState = {
     layout: "simple",
     setLayout: () => null,
-    element: <AppShellPrimary />
+    element: <AppShellPrimary />,
+    setInitiallyVisible: () => null
 };
 
 const LayoutProviderContext = createContext<LayoutProviderState>(initialState);
@@ -32,10 +34,15 @@ export function LayoutProvider({
     ...props
 }: LayoutProviderProps) {
     const [layout, setLayout] = useState<Layout>(() => (localStorage.getItem(storageKey) as Layout) || defaultLayout);
+    const [initiallyVisible, setInitiallyVisible] = useState(true);
 
     const AppLayout = useMemo(() => {
-        return layout === "simple" ? <AppShellPrimary /> : <AppShell navbarActions={[]} navbarVisble={true} />;
-    }, [layout]);
+        return layout === "simple" ? (
+            <AppShellPrimary initiallyVisible={initiallyVisible} />
+        ) : (
+            <AppShell navbarActions={[]} navbarVisble={true} />
+        );
+    }, [layout, initiallyVisible]);
 
     const value = {
         element: AppLayout,
@@ -43,7 +50,8 @@ export function LayoutProvider({
         setLayout: (layout: Layout) => {
             localStorage.setItem(storageKey, layout);
             setLayout(layout);
-        }
+        },
+        setInitiallyVisible
     };
 
     return (

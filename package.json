@@ -33,6 +33,7 @@
         "next-themes": "^0.3.0",
         "perfect-freehand": "^1.2.2",
         "react": "^18.3.1",
+        "react-color": "^2.19.3",
         "react-color-palette": "^7.1.0",
         "react-dom": "^18.3.1",
         "react-hook-form": "^7.51.5",
@@ -47,6 +48,7 @@
         "zod": "^3.23.8"
     },
     "devDependencies": {
+        "@types/react-color": "^3.0.12",
         "@types/node": "^20.11.28",
         "@types/react": "^18.2.15",
         "@types/react-dom": "^18.2.7",

@@ -1,8 +1,8 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcons } from "@/components/ui/icon";
 
 import { ElementEnum } from "./custom-canvas";
 
 export interface Option {
-    icon: LucideIcon;
+    icon: LucideIcons;
     value: ElementEnum;
 }

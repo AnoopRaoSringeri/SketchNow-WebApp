@@ -1,4 +1,3 @@
-import { LogOut, LucideIcon, Package2, PanelLeft, Search, Settings, User } from "lucide-react";
 import { observer } from "mobx-react";
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
@@ -13,6 +12,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import Icon, { LucideIcons } from "@/components/ui/icon";
 import { Image } from "@/components/ui/image";
 import { Input } from "@/components/ui/input";
 import { LayoutToggle } from "@/components/ui/layout-toggle";
@@ -23,7 +23,7 @@ import { SketchNow } from "@/images";
 import { cn } from "@/lib/utils";
 
 type NavbarActionType = {
-    Icon: LucideIcon;
+    icon: LucideIcons;
     onClick?: () => unknown;
     link: string;
     label: string;
@@ -77,7 +77,7 @@ export const AppShell = observer(function AppShell({ navbarActions, navbarVisble
                                             setNav(a.value);
                                         }}
                                     >
-                                        <a.Icon className="size-5 transition-all hover:scale-105" />
+                                        <Icon name={a.icon} className="size-5 transition-all hover:scale-105" />
                                         <span className="sr-only">{a.label}</span>
                                     </NavLink>
                                 </TooltipTrigger>
@@ -94,7 +94,7 @@ export const AppShell = observer(function AppShell({ navbarActions, navbarVisble
                                     to="#"
                                     className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:size-8"
                                 >
-                                    <Settings className="size-5" />
+                                    <Icon name="Settings" className="size-5" />
                                     <span className="sr-only">Settings</span>
                                 </NavLink>
                             </TooltipTrigger>
@@ -109,7 +109,7 @@ export const AppShell = observer(function AppShell({ navbarActions, navbarVisble
                                     className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:size-8"
                                     onClick={logout}
                                 >
-                                    <LogOut className="size-5" />
+                                    <Icon name="LogOut" className="size-5" />
                                     <span className="sr-only">Logout</span>
                                 </NavLink>
                             </TooltipTrigger>
@@ -128,7 +128,7 @@ export const AppShell = observer(function AppShell({ navbarActions, navbarVisble
                     <Sheet>
                         <SheetTrigger asChild>
                             <Button size="icon" variant="outline" className="sm:hidden">
-                                <PanelLeft className="size-5" />
+                                <Icon name="PanelLeft" className="size-5" />
                                 <span className="sr-only">Toggle Menu</span>
                             </Button>
                         </SheetTrigger>
@@ -139,7 +139,7 @@ export const AppShell = observer(function AppShell({ navbarActions, navbarVisble
                                     to="#"
                                     className="group flex size-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
                                 >
-                                    <Package2 className="size-5 transition-all group-hover:scale-110" />
+                                    <Icon name="Package2" className="size-5 transition-all group-hover:scale-110" />
                                     <span className="sr-only">Acme Inc</span>
                                 </NavLink>
                                 {navbarActions.map((a) => (
@@ -148,7 +148,7 @@ export const AppShell = observer(function AppShell({ navbarActions, navbarVisble
                                         to={a.link}
                                         className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                                     >
-                                        <a.Icon className="size-5" />
+                                        <Icon name={a.icon} className="size-5" />
                                         {a.label}
                                     </NavLink>
                                 ))}
@@ -177,7 +177,7 @@ export const AppShell = observer(function AppShell({ navbarActions, navbarVisble
                     <div style={{ flex: 1 }} />
                     {nav === "home" ? (
                         <div className="relative ml-auto flex-1 md:grow-0">
-                            <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+                            <Icon name="Search" className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
                             <Input
                                 type="search"
                                 placeholder="Search..."
@@ -195,7 +195,7 @@ export const AppShell = observer(function AppShell({ navbarActions, navbarVisble
                                     alt="Avatar"
                                     className="overflow-hidden rounded-full"
                                 /> */}
-                                <User className="overflow-hidden rounded-full" />
+                                <Icon name="User" className="overflow-hidden rounded-full" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
