@@ -13,7 +13,7 @@ export function LayoutToggle() {
     const { setLayout, layout } = useLayout();
 
     return (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
                 <Button variant="simple" size="icon">
                     {layout === "simple" ? (

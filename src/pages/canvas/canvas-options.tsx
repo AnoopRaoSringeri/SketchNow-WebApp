@@ -9,6 +9,7 @@ import { CanvasStyleEditor } from "@/components/mini-components/canvas-style-edi
 import { ElementStyleEditor } from "@/components/mini-components/element-style-editor";
 import { ZoomController } from "@/components/mini-components/zoom-controller";
 import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { useCanvas } from "@/hooks/use-canvas";
 import { ElementEnum } from "@/types/custom-canvas";
@@ -44,9 +45,13 @@ const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }
             const response = await sketchStore.SaveSketch(canvasBoard.toJSON(), sketchName);
             if (response) {
                 toast.success("Sketch updated successfully");
-                navigate(`/sketch/${response._id}`);
+                navigate(`/${response._id}`);
             }
         }
+    };
+
+    const goToHome = () => {
+        navigate("/sketches");
     };
 
     return (
@@ -73,7 +78,12 @@ const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }
                         </Button>
                     </div>
                 </div>
-                <CanvasStyleEditor />
+                <div className="absolute left-5 top-5 z-[100]">
+                    <Button size="sm" onClick={goToHome}>
+                        <Icon size="20px" name="House" />
+                    </Button>
+                </div>
+                {canvasBoard.ElementType == ElementEnum.Move ? null : <CanvasStyleEditor />}
                 <ElementStyleEditor />
                 <ZoomController />
             </div>

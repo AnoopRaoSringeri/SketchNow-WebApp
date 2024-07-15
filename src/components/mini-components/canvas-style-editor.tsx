@@ -56,6 +56,7 @@ export const CanvasStyleEditor = observer(function CanvasStyleEditor() {
     const { id } = useParams<{ id: string }>();
     const { canvasBoard } = useCanvas(id ?? "new");
     const canvasStyle = canvasBoard.Style;
+
     return (
         <div className="absolute left-5 top-20 z-[100]  flex  flex-row items-center gap-1">
             <ScrollArea>

@@ -43,9 +43,9 @@ function AppContainer() {
                         </Suspense>
                     }
                 />
-                <Route path="sketch" element={element}>
+                <Route path="/" element={element}>
                     <Route
-                        path=""
+                        path="sketches"
                         element={
                             <Suspense fallback={<Loader />}>
                                 <SketchList />
@@ -53,7 +53,7 @@ function AppContainer() {
                         }
                     />
                     <Route
-                        path="/sketch/:id"
+                        path="sketch/:id"
                         element={
                             <Suspense fallback={<Loader />}>
                                 <CanvasBoard />
@@ -61,14 +61,6 @@ function AppContainer() {
                         }
                     />
                 </Route>
-                {/* <Route
-                    path="/sketch/:id"
-                    element={
-                        <Suspense fallback={<Loader />}>
-                            <CanvasBoard />
-                        </Suspense>
-                    }
-                /> */}
             </Routes>
         </HashRouter>
     );
