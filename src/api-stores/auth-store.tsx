@@ -85,6 +85,21 @@ class AuthStore {
         }
     }
 
+    async ForgotPassword(email: string): Promise<boolean> {
+        try {
+            await axios.post(
+                `${BaseUrl}forgotPassword`,
+                {
+                    email
+                },
+                getRequestConfig()
+            );
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     async IsValidSession(): Promise<boolean> {
         try {
             await axios.get(`${BaseUrl}`, getRequestConfig(true));
