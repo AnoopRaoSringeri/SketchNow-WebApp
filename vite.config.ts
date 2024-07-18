@@ -4,9 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { defineConfig } from "vite";
 import mkcert from "vite-plugin-mkcert";
-
 dotenv.config();
-
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
