@@ -9,6 +9,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
 import { useCanvas } from "@/hooks/use-canvas";
 
+import { OptionsWrapper } from "./options-wrapper";
+
 const SWATCHES = [
     "#FF6900",
     "#FCB900",
@@ -114,6 +116,7 @@ export const CanvasStyleEditor = observer(function CanvasStyleEditor() {
                             />
                         </div>
                     </div>
+                    <OptionsWrapper />
                 </div>
             </ScrollArea>
         </div>

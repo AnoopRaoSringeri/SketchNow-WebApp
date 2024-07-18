@@ -41,6 +41,7 @@ export class CanvasBoard implements ICanvas {
     private _hoveredObject: ICanvasObjectWithId | null = null;
 
     _elementType: ElementEnum = ElementEnum.Move;
+    _isElementSelectorLocked = false;
     _currentCanvasAction: CanvasActionEnum = CanvasActionEnum.Select;
     _zoom = 100;
     _style: IObjectStyle = DefaultStyle;
@@ -59,6 +60,8 @@ export class CanvasBoard implements ICanvas {
         makeObservable(this, {
             _elementType: observable,
             ElementType: computed,
+            _isElementSelectorLocked: observable,
+            IsElementSelectorLocked: computed,
             _style: observable,
             Style: computed,
             setStyle: action,
@@ -103,14 +106,16 @@ export class CanvasBoard implements ICanvas {
     }
 
     set ElementType(type: ElementEnum) {
-        this._elementType = type;
-        this._activeObjects = [];
-        this.unSelectElements();
-        if (this.CanvasCopy) {
-            if (type == ElementEnum.Pencil) {
-                this.CanvasCopy.style.cursor = "crosshair";
-            } else {
-                this.CanvasCopy.style.cursor = "default";
+        if (type != this._elementType) {
+            this._elementType = type;
+            this._activeObjects = [];
+            this.unSelectElements();
+            if (this.CanvasCopy) {
+                if (type == ElementEnum.Pencil) {
+                    this.CanvasCopy.style.cursor = "crosshair";
+                } else {
+                    this.CanvasCopy.style.cursor = "default";
+                }
             }
         }
     }
@@ -229,6 +234,14 @@ export class CanvasBoard implements ICanvas {
         this._clicked = value;
     }
 
+    get IsElementSelectorLocked() {
+        return this._isElementSelectorLocked;
+    }
+
+    set IsElementSelectorLocked(value: boolean) {
+        this._isElementSelectorLocked = value;
+    }
+
     init({ width, height }: Size) {
         if (!this.CanvasCopy) {
             return;
@@ -313,6 +326,13 @@ export class CanvasBoard implements ICanvas {
         this.redrawBoard();
     }
 
+    removeElements() {
+        this._elements = this.Elements.filter((e) => this.SelectedElements.find((se) => se.id == e.id) == null);
+        this.SelectedElements = [];
+        this.SelectionElement = null;
+        this.redrawBoard();
+    }
+
     copyElement(id: string) {
         if (!this.CanvasCopy) {
             return;
@@ -331,6 +351,60 @@ export class CanvasBoard implements ICanvas {
             this.SelectedElements = [copyElement];
             this.saveBoard();
         }
+    }
+
+    copyElements() {
+        if (!this.CanvasCopy) {
+            return;
+        }
+        if (!this.SelectionElement) {
+            return;
+        }
+        const context = this.CanvasCopy.getContext("2d");
+        if (!context) {
+            return;
+        }
+        const elementsToCopy = this.Elements.filter((e) => this.SelectedElements.find((se) => se.id == e.id) != null);
+        CanvasHelper.clearCanvasArea(context, this.Transform);
+        const copiedItems: ICanvasObjectWithId[] = [];
+        elementsToCopy.forEach((ele) => {
+            const copyElement = CavasObjectMap[ele.type]({ ...ele, id: uuid() }, this);
+            copyElement.move(context, { x: 0, y: 0 }, "down", false);
+            copyElement.move(context, { x: 40, y: 40 }, "up", false);
+            copiedItems.push(copyElement);
+        });
+        context.closePath();
+        this._elements.push(...elementsToCopy);
+
+        this.SelectedElements = copiedItems;
+        if (this.SelectedElements.length <= 0) {
+            this.PointerOrigin = null;
+            this.unSelectElements();
+            return;
+        }
+        this._applySelectionStyle = false;
+        // Uncomment if individual selection is required
+        this.SelectedElements.forEach((ele) => {
+            ele.select(ele.getValues());
+            ele.set("ShowSelection", false);
+        });
+        const selectedAreaBoundary = CanvasHelper.getSelectedAreaBoundary(this.SelectedElements);
+        this.SelectionElement.update(
+            context,
+            {
+                ...selectedAreaBoundary
+            },
+            "up"
+        );
+        this.SelectionElement.draw(context);
+        this.SelectionElement.select({});
+        this.SelectionElement.set("ShowSelection", true);
+        // this.SelectionElement = null;
+        // this.SelectedElements = [];
+        this.ActiveObjects = copiedItems;
+        console.log(this._elements);
+        this.saveBoard();
+        console.log(this._elements);
     }
 
     zoomIn() {
@@ -398,15 +472,17 @@ export class CanvasBoard implements ICanvas {
                 this.SelectedElements = this._activeObjects;
                 this._activeObjects = [];
                 this._hoveredObject = null;
-                this.redrawBoard();
             } else {
                 this._elements.push(...this._activeObjects);
                 this._pointerOrigin = null;
                 this._activeObjects = [];
                 this._hoveredObject = null;
-                this.redrawBoard();
             }
         }
+        if (!this._isElementSelectorLocked) {
+            this.ElementType = ElementEnum.Move;
+        }
+        this.redrawBoard();
     }
 
     redrawBoard() {

@@ -12,23 +12,24 @@ export const SelectionOptions = observer(function SelectionOptions() {
     if (!element || element.IsDragging) {
         return <></>;
     }
-    const { ax, ay } = element.getPosition();
-    const { w = 0 } = element.getValues();
+    // const { ax, ay } = element.getPosition();
+    // const { w = 0 } = element.getValues();
 
     function removeElement() {
         if (element) {
-            canvasBoard.removeElement(element.id);
+            canvasBoard.removeElements();
         }
     }
 
     function copyElement() {
         if (element) {
-            canvasBoard.copyElement(element.id);
+            canvasBoard.copyElements();
         }
     }
 
     return (
-        <div className="absolute z-[100] flex " style={{ top: ay - 30, left: ax + w * canvasBoard.Transform.a - 68 }}>
+        <div className=" flex ">
+            {/* <div className="absolute z-[100] flex " style={{ top: ay - 30, left: ax + w * canvasBoard.Transform.a - 68 }}> */}
             <Button size="xs" variant="ghost" onClick={copyElement}>
                 <Copy size={20} />
             </Button>

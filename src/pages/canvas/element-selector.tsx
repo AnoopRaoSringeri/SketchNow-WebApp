@@ -19,7 +19,20 @@ const ElementSelector = observer(function ElementSelector({
 
     return (
         <div className="absolute top-5 z-[100] flex flex-row items-center gap-1">
-            {/* <div className="absolute left-5 z-[100]  flex flex-col items-center gap-1"> */}
+            <Button
+                size="sm"
+                variant={canvasBoard.IsElementSelectorLocked ? "default" : "secondary"}
+                onClick={() => {
+                    canvasBoard.IsElementSelectorLocked = !canvasBoard.IsElementSelectorLocked;
+                }}
+            >
+                {canvasBoard.IsElementSelectorLocked ? (
+                    <Icon name="Lock" size="20px" />
+                ) : (
+                    <Icon name="LockOpen" size="20px" />
+                )}
+            </Button>
+            <Icon name="Minus" className="rotate-90" size="30px" />
             {options.map((o) => (
                 <Button
                     size="sm"

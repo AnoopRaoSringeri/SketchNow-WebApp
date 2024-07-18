@@ -45,7 +45,7 @@ const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }
             const response = await sketchStore.SaveSketch(canvasBoard.toJSON(), sketchName);
             if (response) {
                 toast.success("Sketch updated successfully");
-                navigate(`/${response._id}`);
+                navigate(`/sketch/${response._id}`);
             }
         }
     };

@@ -13,8 +13,8 @@ export const ElementOptions = observer(function ElementOptions() {
     if (!element) {
         return <></>;
     }
-    const { ax, ay } = element.getPosition();
-    const { w = 0 } = element.getValues();
+    // const { ax, ay } = element.getPosition();
+    // const { w = 0 } = element.getValues();
 
     function removeElement() {
         canvasBoard.removeElement(element.id);
@@ -25,7 +25,8 @@ export const ElementOptions = observer(function ElementOptions() {
     }
 
     return (
-        <div className="absolute z-[100] flex " style={{ top: ay - 30, left: ax + w * canvasBoard.Transform.a - 68 }}>
+        <div className=" flex ">
+            {/* <div className="absolute z-[100] flex " style={{ top: ay - 30, left: ax + w * canvasBoard.Transform.a - 68 }}> */}
             <Button size="xs" variant="ghost" onClick={copyElement}>
                 <Icon name="Copy" size={20} />
             </Button>

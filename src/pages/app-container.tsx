@@ -5,12 +5,12 @@ import { HashRouter } from "react-router-dom";
 import { Loader } from "@/components/ui/loader";
 import { useLayout } from "@/hooks/layout-provider";
 import { Auth } from "@/pages/auth/auth-page";
+import { ForgotPasswordPage } from "@/pages/auth/forgot-password-page";
 import { LogInPage } from "@/pages/auth/login-page";
 import { RegisterPage } from "@/pages/auth/register-page";
 import { CanvasBoard } from "@/pages/canvas/canvas-board";
 import SketchList from "@/pages/canvas/sketches";
-
-import { PlaygroundCanvas } from "./playground/playground-canvas";
+import { PlaygroundCanvas } from "@/pages/playground/playground-canvas";
 
 function AppContainer() {
     const { element } = useLayout();
@@ -31,6 +31,14 @@ function AppContainer() {
                         element={
                             <Suspense fallback={<Loader />}>
                                 <RegisterPage />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="forgot-password"
+                        element={
+                            <Suspense fallback={<Loader />}>
+                                <ForgotPasswordPage />
                             </Suspense>
                         }
                     />

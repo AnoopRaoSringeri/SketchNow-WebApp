@@ -65,5 +65,16 @@ export function useAuth() {
         setLoading(false);
     };
 
-    return { register, logOut, logIn, loading, refreshToken };
+    const forgotPassword = async (email: string) => {
+        setLoading(true);
+        const res = await authStore.ForgotPassword(email);
+        if (res) {
+            toast.success("Forgot password link has been sent to the email");
+        } else {
+            toast.error("Forgot password failed");
+        }
+        setLoading(false);
+    };
+
+    return { register, logOut, logIn, loading, refreshToken, forgotPassword };
 }
