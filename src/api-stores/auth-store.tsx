@@ -7,7 +7,7 @@ export const getRequestConfig = (withCredentials?: boolean) => {
         headers: {
             "Content-type": "application/json; charset=UTF-8"
         },
-        withCredentials: false
+        withCredentials: withCredentials
     };
 };
 
