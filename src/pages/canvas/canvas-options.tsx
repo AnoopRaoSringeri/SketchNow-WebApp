@@ -5,9 +5,9 @@ import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
 import { useStore } from "@/api-stores/store-provider";
-import { CanvasStyleEditor } from "@/components/mini-components/canvas-style-editor";
-import { ElementStyleEditor } from "@/components/mini-components/element-style-editor";
-import { ZoomController } from "@/components/mini-components/zoom-controller";
+import { CanvasStyleEditor } from "@/pages/mini-components/canvas-style-editor";
+import { ElementStyleEditor } from "@/pages/mini-components/element-style-editor";
+import { ZoomController } from "@/pages/mini-components/zoom-controller";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";

@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import { useEffect } from "react";
 import { useParams } from "react-router";
 
-import { OptionsWrapper } from "@/components/mini-components/options-wrapper";
+import { OptionsWrapper } from "@/pages/mini-components/options-wrapper";
 import { useCanvas } from "@/hooks/use-canvas";
 
 import CanvasOptions from "../canvas/canvas-options";

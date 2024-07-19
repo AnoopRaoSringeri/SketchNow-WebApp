@@ -58,8 +58,8 @@ export class EventManager {
                         this.Board.ActiveObjects.forEach((ao) => {
                             ao.move(context, { x: 0, y: 0 }, "down");
                         });
+                        this.Board._currentCanvasAction = CanvasActionEnum.Select;
                     }
-                    this.Board._currentCanvasAction = CanvasActionEnum.Select;
                 } else {
                     CanvasHelper.clearCanvasArea(context, this.Board.Transform);
                     if (this.Board.SelectionElement) {

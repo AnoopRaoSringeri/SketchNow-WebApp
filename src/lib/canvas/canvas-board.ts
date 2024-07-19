@@ -374,7 +374,6 @@ export class CanvasBoard implements ICanvas {
             copiedItems.push(copyElement);
         });
         context.closePath();
-        this._elements.push(...elementsToCopy);
 
         this.SelectedElements = copiedItems;
         if (this.SelectedElements.length <= 0) {
@@ -399,10 +398,11 @@ export class CanvasBoard implements ICanvas {
         this.SelectionElement.draw(context);
         this.SelectionElement.select({});
         this.SelectionElement.set("ShowSelection", true);
-        // this.SelectionElement = null;
-        // this.SelectedElements = [];
+        elementsToCopy.forEach((ele) => {
+            ele.unSelect();
+        });
         this.ActiveObjects = copiedItems;
-        console.log(this._elements);
+        // this.Elements = this.Elements.filter((e) => elementsToCopy.find((c) => c.id == e.id) == null);
         this.saveBoard();
         console.log(this._elements);
     }
