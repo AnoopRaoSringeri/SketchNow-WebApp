@@ -18,6 +18,7 @@ export interface IObjectStyle {
     strokeStyle: string;
     fillColor: string;
     strokeWidth: number;
+    opacity: number;
 }
 
 export interface IObjectValueWithId extends Partial<IObjectValue> {
@@ -38,7 +39,8 @@ export interface ICanvasObjectMethods {
     updateStyle: <T extends keyof IObjectStyle>(
         ctx: CanvasRenderingContext2D,
         key: T,
-        value: IObjectStyle[T]
+        value: IObjectStyle[T],
+        clearCanvas?: boolean
     ) => unknown;
     move: (ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas?: boolean) => unknown;
     toSVG: (options: IToSVGOptions) => string;
@@ -62,7 +64,7 @@ export interface ObjectOptions {
 }
 export interface ICanvasObject extends Partial<IObjectValue>, ICanvasObjectMethods, ObjectOptions {
     type: ElementEnum;
-    readonly _parent: CanvasBoard;
+    readonly Board: CanvasBoard;
 }
 
 export interface ICanvasObjectWithId extends ICanvasObject {
@@ -81,12 +83,12 @@ export interface ICanvas {
 }
 
 export interface ICanvasTransform {
-    a: number;
+    scaleX: number;
     b: number;
     c: number;
-    d: number;
-    e: number;
-    f: number;
+    scaleY: number;
+    transformX: number;
+    transformY: number;
 }
 
 export enum ElementEnum {

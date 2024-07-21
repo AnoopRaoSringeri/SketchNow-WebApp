@@ -17,7 +17,7 @@ import {
 import { CanvasBoard } from "../canvas-board";
 
 export class Line implements ICanvasObjectWithId {
-    readonly _parent: CanvasBoard;
+    readonly Board: CanvasBoard;
     type: ElementEnum = ElementEnum.Line;
     id = uuid();
     style = DefaultStyle;
@@ -27,7 +27,7 @@ export class Line implements ICanvasObjectWithId {
         this.points = [...(v.points ?? [])];
         this.id = v.id;
         this.style = { ...(v.style ?? DefaultStyle) };
-        this._parent = parent;
+        this.Board = parent;
     }
     points: [number, number][] = [];
     x = 0;
@@ -87,7 +87,7 @@ export class Line implements ICanvasObjectWithId {
     }
 
     getPosition() {
-        return CanvasHelper.getAbsolutePosition({ x: this.x, y: this.y }, this._parent.Transform);
+        return CanvasHelper.getAbsolutePosition({ x: this.x, y: this.y }, this.Board.Transform);
     }
 
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
@@ -96,7 +96,7 @@ export class Line implements ICanvasObjectWithId {
             CanvasHelper.applyStyles(ctx, this.style);
         }
         if (clearCanvas) {
-            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+            this.Board.Helper.clearCanvasArea(ctx);
         }
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
@@ -113,7 +113,7 @@ export class Line implements ICanvasObjectWithId {
     updateStyle<T extends keyof IObjectStyle>(ctx: CanvasRenderingContext2D, key: T, value: IObjectStyle[T]) {
         this.style[key] = value;
         CanvasHelper.applyStyles(ctx, this.style);
-        CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+        this.Board.Helper.clearCanvasArea(ctx);
         this.draw(ctx);
     }
 
@@ -122,7 +122,7 @@ export class Line implements ICanvasObjectWithId {
         if (action == "down") {
             CanvasHelper.applyStyles(ctx, this.style);
         }
-        CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+        this.Board.Helper.clearCanvasArea(ctx);
         ctx.beginPath();
         if (this.points.length > 0) {
             const [px, py] = this.points[0];

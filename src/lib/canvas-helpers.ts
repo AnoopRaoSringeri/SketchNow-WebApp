@@ -10,7 +10,14 @@ import {
     IToSVGOptions
 } from "@/types/custom-canvas";
 
-export const DefaultStyle: IObjectStyle = { fillColor: "transparent", strokeStyle: "#fff", strokeWidth: 1 };
+import { CanvasBoard } from "./canvas/canvas-board";
+
+export const DefaultStyle: IObjectStyle = {
+    fillColor: "transparent",
+    strokeStyle: "#fff",
+    strokeWidth: 1,
+    opacity: 100
+};
 
 const HOVER_OFFSET = 10;
 
@@ -28,22 +35,28 @@ export const MIN_INTERVAL = 1;
 export const SELECTION_ELEMENT_ID = "select-element";
 
 export const DEFAULT_TRANSFORM: ICanvasTransform = {
-    a: 1,
+    scaleX: 1,
     b: 0,
     c: 0,
-    d: 1,
-    e: 0,
-    f: 0
+    scaleY: 1,
+    transformX: 0,
+    transformY: 0
 };
 
 export const SelectionStyle: IObjectStyle = {
     fillColor: "#ccffff10",
     strokeStyle: "#ccffff",
-    strokeWidth: 0.1
+    strokeWidth: 0.1,
+    opacity: 100
 };
 
 let CanvasWorker: Worker | null = null;
 export class CanvasHelper {
+    Board: CanvasBoard;
+    constructor(board: CanvasBoard) {
+        this.Board = board;
+    }
+
     static getHeightRatio(canvasHeight: number, newHeight: number) {
         return newHeight / canvasHeight;
     }
@@ -56,7 +69,7 @@ export class CanvasHelper {
         return { height: nSize.height / cSize.height, width: nSize.width / cSize.width };
     }
 
-    static getCursorPosition(mousePosition: Position, values: CanvasObject, type: ElementEnum): CursorPosition {
+    getCursorPosition(mousePosition: Position, values: CanvasObject, type: ElementEnum): CursorPosition {
         const { x, y } = mousePosition;
         const { x: cx = 0, y: cy = 0, h = 0, w = 0, style = DefaultStyle } = values;
         const { strokeWidth } = style;
@@ -65,29 +78,18 @@ export class CanvasHelper {
         const ucy = cy + -wFactor;
         const uh = h + ucy + wFactor * 2;
         const uw = w + ucx + wFactor * 2;
+        const hOffSet = HOVER_OFFSET / this.Board.Transform.scaleX;
         switch (type) {
             case ElementEnum.Square:
             case ElementEnum.Circle:
             case ElementEnum.Rectangle:
-                return x >= ucx - HOVER_OFFSET &&
-                    x <= ucx + HOVER_OFFSET &&
-                    y >= ucy - HOVER_OFFSET &&
-                    y <= ucy + HOVER_OFFSET
+                return x >= ucx - hOffSet && x <= ucx + hOffSet && y >= ucy - hOffSet && y <= ucy + hOffSet
                     ? "tl"
-                    : x >= ucx - HOVER_OFFSET &&
-                        x <= ucx + HOVER_OFFSET &&
-                        y >= uh - HOVER_OFFSET &&
-                        y <= uh + HOVER_OFFSET
+                    : x >= ucx - hOffSet && x <= ucx + hOffSet && y >= uh - hOffSet && y <= uh + hOffSet
                       ? "bl"
-                      : x >= uw - HOVER_OFFSET &&
-                          x <= uw + HOVER_OFFSET &&
-                          y >= ucy - HOVER_OFFSET &&
-                          y <= ucy + HOVER_OFFSET
+                      : x >= uw - hOffSet && x <= uw + hOffSet && y >= ucy - hOffSet && y <= ucy + hOffSet
                         ? "tr"
-                        : x >= uw - HOVER_OFFSET &&
-                            x <= uw + HOVER_OFFSET &&
-                            y >= uh - HOVER_OFFSET &&
-                            y <= uh + HOVER_OFFSET
+                        : x >= uw - hOffSet && x <= uw + hOffSet && y >= uh - hOffSet && y <= uh + hOffSet
                           ? "br"
                           : "m";
             default:
@@ -144,7 +146,7 @@ export class CanvasHelper {
         return { x, y, h, w };
     }
 
-    static isUnderMouse(mousePosition: Position, values: Partial<IObjectValue>) {
+    isUnderMouse(mousePosition: Position, values: Partial<IObjectValue>) {
         const { x, y } = mousePosition;
         const { x: cx = 0, y: cy = 0, h = 0, w = 0, points = [], style = DefaultStyle } = values;
         const { strokeWidth } = style;
@@ -154,16 +156,18 @@ export class CanvasHelper {
         const uh = h + wFactor * 2;
         const uw = w + wFactor * 2;
         const [lpx, lpy] = points.length > 0 ? points[0] : [0, 0];
+        const hOffSet = HOVER_OFFSET / this.Board.Transform.scaleX;
+
         return (
             (x >= ucx && x <= ucx + uw && y >= ucy && y <= ucy + uh) ||
             (x >= ucx && x <= ucx + uh && y >= ucy && y <= ucy + uh) ||
             // (x >= cx - ur && y >= cy - ur && x <= cx + ur && y <= cy + ur) ||
             points.find(
                 ([px, py]) =>
-                    px - (HOVER_OFFSET + wFactor) <= x &&
-                    x <= px + HOVER_OFFSET + wFactor &&
-                    py - (HOVER_OFFSET + wFactor) <= y &&
-                    y <= py + HOVER_OFFSET + wFactor
+                    px - (hOffSet + wFactor) <= x &&
+                    x <= px + hOffSet + wFactor &&
+                    py - (hOffSet + wFactor) <= y &&
+                    y <= py + hOffSet + wFactor
             ) != null ||
             // (x == ucx && y == ucy) ||
             (x == lpx + wFactor && y == lpy + wFactor)
@@ -204,7 +208,7 @@ export class CanvasHelper {
         return h <= height && w <= width && x >= px && y >= py && h + y <= height + py && w + x <= width + px;
     }
 
-    static hoveredElement(mouseCords: Position, elements: ICanvasObjectWithId[]) {
+    hoveredElement(mouseCords: Position, elements: ICanvasObjectWithId[]) {
         return elements.find(
             (e) =>
                 this.isUnderMouse(mouseCords, e.getValues()) ||
@@ -220,12 +224,12 @@ export class CanvasHelper {
         return `fill: ${style.fillColor}; stroke: ${style.strokeStyle}; stroke-width: ${style.strokeWidth * Math.max(height, width)}px;`;
     }
 
-    static getCurrentMousePosition(event: MouseEvent, { e, f, a }: ICanvasTransform) {
+    static getCurrentMousePosition(event: MouseEvent, { transformX: e, transformY: f, scaleX: a }: ICanvasTransform) {
         const { offsetX: x, offsetY: y } = event;
         return { offsetX: (x - e) / a, offsetY: (y - f) / a };
     }
 
-    static getAbsolutePosition({ x, y }: Position, { e, f, a }: ICanvasTransform) {
+    static getAbsolutePosition({ x, y }: Position, { transformX: e, transformY: f, scaleX: a }: ICanvasTransform) {
         return { x, y, ax: x * a + e, ay: y * a + f };
     }
 
@@ -253,8 +257,6 @@ export class CanvasHelper {
                         h = Math.max(h, py);
                         w = Math.max(w, px);
                     });
-                    h = h - y;
-                    w = w - x;
                     break;
             }
         });
@@ -263,18 +265,20 @@ export class CanvasHelper {
         return { x, y, h, w };
     }
 
-    static clearCanvasArea(
-        ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
-        { a, e, f }: ICanvasTransform
-    ) {
-        const xf = (Math.abs(e) * (a + 1)) / a;
-        const yf = (Math.abs(f) * (a + 1)) / a;
-        ctx.clearRect(-xf, -yf, window.innerWidth / a + xf, window.innerHeight / a + yf);
+    clearCanvasArea(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        // const { scaleX: a, transformX: e, transformY: f } = this.Board.Transform;
+        // const xf = (Math.abs(e) * (a + 1)) / a;
+        // const yf = (Math.abs(f) * (a + 1)) / a;
+        // ctx.clearRect(-xf, -yf, window.innerWidth / a + xf, window.innerHeight / a + yf);
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.restore();
     }
 
     static getCanvasBoundary(
         ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
-        { a, e, f }: ICanvasTransform,
+        { scaleX: a, transformX: e, transformY: f }: ICanvasTransform,
         size: Size
     ) {
         const xf = (Math.abs(e) * (a + 1)) / a;
@@ -284,10 +288,11 @@ export class CanvasHelper {
 
     static applyStyles(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, style: IObjectStyle) {
         ctx.save();
-        const { fillColor, strokeStyle, strokeWidth } = style;
+        const { fillColor, strokeStyle, strokeWidth, opacity } = style;
         ctx.fillStyle = fillColor;
         ctx.strokeStyle = strokeStyle;
         ctx.lineWidth = strokeWidth;
+        ctx.globalAlpha = opacity / 100;
         ctx.lineCap = "round";
     }
 

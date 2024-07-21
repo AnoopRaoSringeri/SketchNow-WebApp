@@ -18,7 +18,7 @@ import {
 import { CanvasBoard } from "../canvas-board";
 
 export class Rectangle implements ICanvasObjectWithId {
-    readonly _parent: CanvasBoard;
+    readonly Board: CanvasBoard;
     type: ElementEnum = ElementEnum.Rectangle;
     id = uuid();
     style = DefaultStyle;
@@ -29,7 +29,7 @@ export class Rectangle implements ICanvasObjectWithId {
         this.w = w ?? 0;
         this.id = id;
         this.style = { ...(style ?? DefaultStyle) };
-        this._parent = parent;
+        this.Board = parent;
         makeObservable(this, {
             _isDragging: observable,
             IsDragging: computed
@@ -67,21 +67,6 @@ export class Rectangle implements ICanvasObjectWithId {
         this._showSelection = value;
     }
 
-    select({ x = this.x, y = this.y, h = this.h, w = this.w }: Partial<IObjectValue>) {
-        this._isSelected = true;
-        if (this._parent.CanvasCopy && this._showSelection) {
-            const copyCtx = this._parent.CanvasCopy.getContext("2d");
-            if (copyCtx) {
-                CanvasHelper.applySelection(copyCtx, { height: h, width: w, x, y });
-            }
-        }
-    }
-
-    unSelect() {
-        this._isSelected = false;
-        this._showSelection = false;
-    }
-
     draw(ctx: CanvasRenderingContext2D) {
         this.create(ctx);
         if (this.IsSelected) {
@@ -96,11 +81,26 @@ export class Rectangle implements ICanvasObjectWithId {
         ctx.closePath();
     }
 
+    select({ x = this.x, y = this.y, h = this.h, w = this.w }: Partial<IObjectValue>) {
+        this._isSelected = true;
+        if (this.Board.CanvasCopy && this._showSelection) {
+            const copyCtx = this.Board.CanvasCopy.getContext("2d");
+            if (copyCtx) {
+                CanvasHelper.applySelection(copyCtx, { height: h, width: w, x, y });
+            }
+        }
+    }
+
+    unSelect() {
+        this._isSelected = false;
+        this._showSelection = false;
+    }
+
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
         let { h = this.h, w = this.w, x = this.x, y = this.y } = objectValue;
         CanvasHelper.applyStyles(ctx, this.style);
         if (clearCanvas) {
-            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+            this.Board.Helper.clearCanvasArea(ctx);
         }
         if (h < 0) {
             y = y + h;
@@ -121,10 +121,17 @@ export class Rectangle implements ICanvasObjectWithId {
         }
     }
 
-    updateStyle<T extends keyof IObjectStyle>(ctx: CanvasRenderingContext2D, key: T, value: IObjectStyle[T]) {
+    updateStyle<T extends keyof IObjectStyle>(
+        ctx: CanvasRenderingContext2D,
+        key: T,
+        value: IObjectStyle[T],
+        clearCanvas = true
+    ) {
         this.style[key] = value;
         CanvasHelper.applyStyles(ctx, this.style);
-        CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+        if (clearCanvas) {
+            this.Board.Helper.clearCanvasArea(ctx);
+        }
         ctx.strokeRect(this.x, this.y, this.w, this.h);
         ctx.fillRect(this.x, this.y, this.w, this.h);
     }
@@ -133,7 +140,7 @@ export class Rectangle implements ICanvasObjectWithId {
         const { x, y } = position;
         CanvasHelper.applyStyles(ctx, this.style);
         if (clearCanvas) {
-            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+            this.Board.Helper.clearCanvasArea(ctx);
         }
         this.IsDragging = true;
         const offsetX = x + this.x;
@@ -153,7 +160,7 @@ export class Rectangle implements ICanvasObjectWithId {
         const { dx, dy } = delta;
         CanvasHelper.applyStyles(ctx, this.style);
         if (clearCanvas) {
-            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+            this.Board.Helper.clearCanvasArea(ctx);
         }
         this.IsDragging = true;
         let w = dx;
@@ -268,7 +275,7 @@ export class Rectangle implements ICanvasObjectWithId {
     }
 
     getPosition() {
-        return CanvasHelper.getAbsolutePosition({ x: this.x, y: this.y }, this._parent.Transform);
+        return CanvasHelper.getAbsolutePosition({ x: this.x, y: this.y }, this.Board.Transform);
     }
 
     toSVG(options: IToSVGOptions) {

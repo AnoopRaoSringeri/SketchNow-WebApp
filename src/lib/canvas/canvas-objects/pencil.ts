@@ -52,7 +52,7 @@ function getSvgPathFromStroke(points: number[][], closed = true) {
     return result;
 }
 export class Pencil implements ICanvasObjectWithId {
-    readonly _parent: CanvasBoard;
+    readonly Board: CanvasBoard;
 
     type: ElementEnum = ElementEnum.Pencil;
     id = uuid();
@@ -61,7 +61,7 @@ export class Pencil implements ICanvasObjectWithId {
         this.points = [...(v.points ?? [])];
         this.id = v.id;
         this.style = { ...(v.style ?? DefaultStyle) };
-        this._parent = parent;
+        this.Board = parent;
     }
     points: [number, number][] = [];
 
@@ -90,35 +90,6 @@ export class Pencil implements ICanvasObjectWithId {
     get Style() {
         return this.style;
     }
-    select({ points = this.points }: Partial<IObjectValue>) {
-        this._isSelected = true;
-        let x = Number.POSITIVE_INFINITY;
-        let y = Number.POSITIVE_INFINITY;
-        let h = Number.MIN_SAFE_INTEGER;
-        let w = Number.MIN_SAFE_INTEGER;
-        points.forEach(([px, py]) => {
-            x = Math.min(x, px);
-            y = Math.min(y, py);
-            h = Math.max(h, py);
-            w = Math.max(w, px);
-        });
-        h = h - y;
-        w = w - x;
-        if (this._parent.CanvasCopy) {
-            const copyCtx = this._parent.CanvasCopy.getContext("2d");
-            if (copyCtx) {
-                CanvasHelper.applySelection(copyCtx, { height: h, width: w, x, y }, false);
-            }
-        }
-    }
-
-    unSelect() {
-        this._isSelected = false;
-    }
-
-    getPosition() {
-        return CanvasHelper.getAbsolutePosition({ x: 0, y: 0 }, this._parent.Transform);
-    }
 
     draw(ctx: CanvasRenderingContext2D) {
         ctx.save();
@@ -141,14 +112,42 @@ export class Pencil implements ICanvasObjectWithId {
         CanvasHelper.applyStyles(ctx, this.style);
     }
 
+    select({ points = this.points }: Partial<IObjectValue>) {
+        this._isSelected = true;
+        let x = Number.POSITIVE_INFINITY;
+        let y = Number.POSITIVE_INFINITY;
+        let h = Number.MIN_SAFE_INTEGER;
+        let w = Number.MIN_SAFE_INTEGER;
+        points.forEach(([px, py]) => {
+            x = Math.min(x, px);
+            y = Math.min(y, py);
+            h = Math.max(h, py);
+            w = Math.max(w, px);
+        });
+        h = h - y;
+        w = w - x;
+        if (this.Board.CanvasCopy && this._showSelection) {
+            const copyCtx = this.Board.CanvasCopy.getContext("2d");
+            if (copyCtx) {
+                CanvasHelper.applySelection(copyCtx, { height: h, width: w, x, y });
+            }
+        }
+    }
+
+    unSelect() {
+        this._isSelected = false;
+        this._showSelection = false;
+    }
+
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
+        const { points = [] } = objectValue;
+        if (points.length == 0) {
+            return;
+        }
+        CanvasHelper.applyStyles(ctx, this.style);
         if (clearCanvas) {
-            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+            this.Board.Helper.clearCanvasArea(ctx);
         }
-        if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
-        }
-        const { points = this.points } = objectValue;
         const [x, y] = points[0];
         const [prevX, prevY] = this.points[this.points.length - 1];
         if (prevX != x || prevY != y) {
@@ -162,14 +161,23 @@ export class Pencil implements ICanvasObjectWithId {
         const myPath = new Path2D(pathData);
         ctx.stroke(myPath);
         ctx.fill(myPath);
+        ctx.restore();
+        // if (action == "up") {
+
+        // }
     }
 
-    move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction) {
+    updateStyle<T extends keyof IObjectStyle>(ctx: CanvasRenderingContext2D, key: T, value: IObjectStyle[T]) {
+        this.style[key] = value;
+        this.draw(ctx);
+    }
+
+    move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
-        if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
+        CanvasHelper.applyStyles(ctx, this.style);
+        if (clearCanvas) {
+            this.Board.Helper.clearCanvasArea(ctx);
         }
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
         const points: [number, number][] = this.points.map((p) => {
             const [px, py] = p;
             const offsetX = x + px;
@@ -184,6 +192,8 @@ export class Pencil implements ICanvasObjectWithId {
         const myPath = new Path2D(pathData);
         ctx.stroke(myPath);
         ctx.fill(myPath);
+        ctx.restore();
+
         this.select({ points });
         if (action == "up") {
             ctx.restore();
@@ -196,9 +206,8 @@ export class Pencil implements ICanvasObjectWithId {
         }
     }
 
-    updateStyle<T extends keyof IObjectStyle>(ctx: CanvasRenderingContext2D, key: T, value: IObjectStyle[T]) {
-        this.style[key] = value;
-        this.draw(ctx);
+    getPosition() {
+        return CanvasHelper.getAbsolutePosition({ x: 0, y: 0 }, this.Board.Transform);
     }
 
     toSVG({ height, width }: IToSVGOptions) {
@@ -232,8 +241,33 @@ export class Pencil implements ICanvasObjectWithId {
     set<T extends keyof ICanvasObject>(key: T, value: ICanvasObject[T]) {
         console.log(key, value);
     }
-    resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction) {
-        console.log(action);
+    resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction, clearCanvas = true) {
+        const { dx, dy } = delta;
+        CanvasHelper.applyStyles(ctx, this.style);
+        if (clearCanvas) {
+            this.Board.Helper.clearCanvasArea(ctx);
+        }
+        this.IsDragging = true;
+        console.log(this.points, "b");
+        this.points = this.points.map((p) => {
+            const [px, py] = p;
+            const offsetX = dx + px;
+            const offsetY = dy + py;
+            return [offsetX, offsetY];
+        });
+        console.log(this.points, "a");
+
+        const stroke = getStroke(this.points, {
+            size: this.style.strokeWidth,
+            ...options
+        });
+        const pathData = getSvgPathFromStroke(stroke);
+        const myPath = new Path2D(pathData);
+        ctx.stroke(myPath);
+        ctx.fill(myPath);
+        ctx.restore();
+
+        this.select({ points: this.points });
         return { x: 0, y: 0, h: 0, w: 0 };
     }
 }

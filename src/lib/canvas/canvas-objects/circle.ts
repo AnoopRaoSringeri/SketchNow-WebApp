@@ -16,12 +16,12 @@ import {
 
 import { CanvasBoard } from "../canvas-board";
 export class Circle implements ICanvasObjectWithId {
-    readonly _parent: CanvasBoard;
+    readonly Board: CanvasBoard;
     type: ElementEnum = ElementEnum.Circle;
     id = uuid();
     style = DefaultStyle;
     constructor(v: PartialCanvasObject, parent: CanvasBoard) {
-        this._parent = parent;
+        this.Board = parent;
         this.x = v.x ?? 0;
         this.y = v.y ?? 0;
         this.w = v.w ?? 0;
@@ -82,8 +82,8 @@ export class Circle implements ICanvasObjectWithId {
 
     select({ x = this.x, y = this.y, w = this.w, h = this.h }: Partial<IObjectValue>) {
         this._isSelected = true;
-        if (this._parent.CanvasCopy && this._isSelected) {
-            const copyCtx = this._parent.CanvasCopy.getContext("2d");
+        if (this.Board.CanvasCopy && this._showSelection) {
+            const copyCtx = this.Board.CanvasCopy.getContext("2d");
             if (copyCtx) {
                 CanvasHelper.applySelection(copyCtx, { height: h, width: w, x, y });
             }
@@ -96,14 +96,14 @@ export class Circle implements ICanvasObjectWithId {
     }
 
     getPosition() {
-        return CanvasHelper.getAbsolutePosition({ x: this.x, y: this.y }, this._parent.Transform);
+        return CanvasHelper.getAbsolutePosition({ x: this.x, y: this.y }, this.Board.Transform);
     }
 
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
         CanvasHelper.applyStyles(ctx, this.style);
         let { h = this.h, w = this.w, x = this.x, y = this.y } = objectValue;
         if (clearCanvas) {
-            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+            this.Board.Helper.clearCanvasArea(ctx);
         }
         ctx.beginPath();
         if (h < 0) {
@@ -143,7 +143,7 @@ export class Circle implements ICanvasObjectWithId {
         const { x, y } = position;
         CanvasHelper.applyStyles(ctx, this.style);
         if (clearCanvas) {
-            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+            this.Board.Helper.clearCanvasArea(ctx);
         }
         this.IsDragging = true;
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -202,7 +202,7 @@ export class Circle implements ICanvasObjectWithId {
         CanvasHelper.applyStyles(ctx, this.style);
 
         if (clearCanvas) {
-            CanvasHelper.clearCanvasArea(ctx, this._parent.Transform);
+            this.Board.Helper.clearCanvasArea(ctx);
         }
         let w = dx;
         let h = dy;

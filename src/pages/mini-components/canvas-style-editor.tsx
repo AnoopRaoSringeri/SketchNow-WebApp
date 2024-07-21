@@ -116,6 +116,15 @@ export const CanvasStyleEditor = observer(function CanvasStyleEditor() {
                             />
                         </div>
                     </div>
+                    <Label className="text-sm">Opacity</Label>
+                    <Slider
+                        value={[canvasStyle.opacity ?? 0]}
+                        max={100}
+                        step={1}
+                        onValueChange={(values) => {
+                            canvasBoard.setStyle("opacity", values[0]);
+                        }}
+                    />
                     <OptionsWrapper />
                 </div>
             </ScrollArea>

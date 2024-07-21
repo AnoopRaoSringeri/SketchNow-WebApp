@@ -123,6 +123,15 @@ export const ElementStyleEditor = observer(function ElemntStyleEditor() {
                             />
                         </div>
                     </div>
+                    <Label className="text-sm">Opacity</Label>
+                    <Slider
+                        value={[elementStyle.opacity ?? 0]}
+                        max={100}
+                        step={1}
+                        onValueChange={(values) => {
+                            canvasBoard.updateStyle("opacity", values[0]);
+                        }}
+                    />
                     <OptionsWrapper />
                 </div>
             </ScrollArea>

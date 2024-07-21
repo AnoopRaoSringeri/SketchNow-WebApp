@@ -53,10 +53,13 @@ export class CanvasBoard implements ICanvas {
     _selectionArea: ICanvasObjectWithId | null = null;
     _applySelectionStyle = true;
 
+    Helper: CanvasHelper;
+
     constructor() {
         this.EventManager = new EventManager(this);
         this._canvas = createRef();
         this._canvasCopy = createRef();
+        this.Helper = new CanvasHelper(this);
         makeObservable(this, {
             _elementType: observable,
             ElementType: computed,
@@ -257,7 +260,7 @@ export class CanvasBoard implements ICanvas {
         this.Height = height ?? metadata.size.height;
         this.Width = width ?? metadata.size.width;
         this.Transform = metadata.transform;
-        this.Zoom = metadata.transform.a * CANVAS_SCALING_MULTIPLIER;
+        this.Zoom = metadata.transform.scaleX * CANVAS_SCALING_MULTIPLIER;
         const objArray = metadata.elements.map((ele) => {
             return CavasObjectMap[ele.type](ele, this);
         });
@@ -297,9 +300,17 @@ export class CanvasBoard implements ICanvas {
         if (this.CanvasCopy) {
             const context = this.CanvasCopy.getContext("2d");
             if (context && this._selectedElements.length > 0) {
+                const clearCanvas = this.SelectionElement == null;
+                if (!clearCanvas) {
+                    this.Helper.clearCanvasArea(context);
+                }
                 this._selectedElements.forEach((ele) => {
-                    ele.updateStyle(context, key, value);
+                    ele.updateStyle(context, key, value, clearCanvas);
                 });
+                if (this.SelectionElement) {
+                    this.SelectionElement.set("ShowSelection", true);
+                    this.SelectionElement.select({});
+                }
                 this.SelectedElements = [...this._selectedElements];
             }
         }
@@ -365,7 +376,7 @@ export class CanvasBoard implements ICanvas {
             return;
         }
         const elementsToCopy = this.Elements.filter((e) => this.SelectedElements.find((se) => se.id == e.id) != null);
-        CanvasHelper.clearCanvasArea(context, this.Transform);
+        this.Helper.clearCanvasArea(context);
         const copiedItems: ICanvasObjectWithId[] = [];
         elementsToCopy.forEach((ele) => {
             const copyElement = CavasObjectMap[ele.type]({ ...ele, id: uuid() }, this);
@@ -402,28 +413,26 @@ export class CanvasBoard implements ICanvas {
             ele.unSelect();
         });
         this.ActiveObjects = copiedItems;
-        // this.Elements = this.Elements.filter((e) => elementsToCopy.find((c) => c.id == e.id) == null);
         this.saveBoard();
-        console.log(this._elements);
     }
 
     zoomIn() {
         if (this.CanvasCopy) {
             const contextCopy = this.CanvasCopy.getContext("2d");
             if (contextCopy) {
-                CanvasHelper.clearCanvasArea(contextCopy, this.Transform);
+                this.Helper.clearCanvasArea(contextCopy);
             }
         }
         const context = this.Canvas.getContext("2d");
         if (context) {
-            CanvasHelper.clearCanvasArea(context, this.Transform);
+            this.Helper.clearCanvasArea(context);
         }
         this.Transform = {
             ...this.Transform,
-            a: this.Transform.a + CANVAS_ZOOM_IN_OUT_FACTOR,
-            d: this.Transform.d + CANVAS_ZOOM_IN_OUT_FACTOR
+            scaleX: this.Transform.scaleX + CANVAS_ZOOM_IN_OUT_FACTOR,
+            scaleY: this.Transform.scaleY + CANVAS_ZOOM_IN_OUT_FACTOR
         };
-        this.Zoom = this.Transform.a * CANVAS_SCALING_MULTIPLIER;
+        this.Zoom = this.Transform.scaleX * CANVAS_SCALING_MULTIPLIER;
         this.redrawBoard();
     }
 
@@ -431,20 +440,20 @@ export class CanvasBoard implements ICanvas {
         if (this.CanvasCopy) {
             const contextCopy = this.CanvasCopy.getContext("2d");
             if (contextCopy) {
-                CanvasHelper.clearCanvasArea(contextCopy, this.Transform);
+                this.Helper.clearCanvasArea(contextCopy);
             }
         }
         const context = this.Canvas.getContext("2d");
         if (context) {
-            CanvasHelper.clearCanvasArea(context, this.Transform);
+            this.Helper.clearCanvasArea(context);
         }
-        const newScale = Math.max(CANVAS_SCALING_LIMIT, this.Transform.a - CANVAS_ZOOM_IN_OUT_FACTOR);
+        const newScale = Math.max(CANVAS_SCALING_LIMIT, this.Transform.scaleX - CANVAS_ZOOM_IN_OUT_FACTOR);
         this.Transform = {
             ...this.Transform,
-            a: newScale,
-            d: newScale
+            scaleX: newScale,
+            scaleY: newScale
         };
-        this.Zoom = this.Transform.a * CANVAS_SCALING_MULTIPLIER;
+        this.Zoom = this.Transform.scaleX * CANVAS_SCALING_MULTIPLIER;
         this.redrawBoard();
     }
 
@@ -452,12 +461,12 @@ export class CanvasBoard implements ICanvas {
         if (this.CanvasCopy) {
             const contextCopy = this.CanvasCopy.getContext("2d");
             if (contextCopy) {
-                CanvasHelper.clearCanvasArea(contextCopy, this.Transform);
+                this.Helper.clearCanvasArea(contextCopy);
             }
         }
         const context = this.Canvas.getContext("2d");
         if (context) {
-            CanvasHelper.clearCanvasArea(context, this.Transform);
+            this.Helper.clearCanvasArea(context);
         }
         this.Transform = CanvasHelper.GetDefaultTransForm();
         this.Zoom = 100;
@@ -494,9 +503,9 @@ export class CanvasBoard implements ICanvas {
                 if (this.CanvasCopy) {
                     const contextCopy = this.CanvasCopy.getContext("2d");
                     if (contextCopy) {
-                        CanvasHelper.clearCanvasArea(contextCopy, this.Transform);
+                        this.Helper.clearCanvasArea(contextCopy);
                         contextCopy.resetTransform();
-                        const { a, b, c, d, e, f } = this.Transform;
+                        const { scaleX: a, b, c, scaleY: d, transformX: e, transformY: f } = this.Transform;
                         contextCopy.transform(a, b, c, d, e, f);
                         this.ActiveObjects.forEach((ele) => {
                             ele.draw(contextCopy);
@@ -509,9 +518,9 @@ export class CanvasBoard implements ICanvas {
                 }
                 const context = this.Canvas.getContext("2d");
                 if (context) {
-                    CanvasHelper.clearCanvasArea(context, this.Transform);
+                    this.Helper.clearCanvasArea(context);
                     context.resetTransform();
-                    const { a, b, c, d, e, f } = this.Transform;
+                    const { scaleX: a, b, c, scaleY: d, transformX: e, transformY: f } = this.Transform;
                     context.transform(a, b, c, d, e, f);
                     this.Elements.forEach((ele) => {
                         ele.draw(context);

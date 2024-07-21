@@ -61,7 +61,7 @@ export class EventManager {
                         this.Board._currentCanvasAction = CanvasActionEnum.Select;
                     }
                 } else {
-                    CanvasHelper.clearCanvasArea(context, this.Board.Transform);
+                    this.Board.Helper.clearCanvasArea(context);
                     if (this.Board.SelectionElement) {
                         this.Board._tempSelectionArea = this.Board.SelectionElement;
                         if (this.Board._currentCanvasAction == CanvasActionEnum.Resize) {
@@ -77,7 +77,7 @@ export class EventManager {
                                 false
                             );
                             this.Board.ActiveObjects.forEach((ele) => {
-                                ele.update(context, {}, "down", false);
+                                ele.update(context, { points: [] }, "down", false);
                             });
                         } else if (this.Board._currentCanvasAction == CanvasActionEnum.Move) {
                             this.Board.ActiveObjects = this.Board.SelectedElements;
@@ -145,8 +145,8 @@ export class EventManager {
                 const { offsetX, offsetY } = e;
                 const dx = offsetX - x;
                 const dy = offsetY - y;
-                const { e: pe, f: pf } = this.Board.Transform;
-                this.Board.Transform = { ...this.Board.Transform, e: pe + dx, f: pf + dy };
+                const { transformX: pe, transformY: pf } = this.Board.Transform;
+                this.Board.Transform = { ...this.Board.Transform, transformX: pe + dx, transformY: pf + dy };
                 this.Board.PointerOrigin = { x: offsetX, y: offsetY };
                 this.Board.redrawBoard();
             } else if (this.Board.ElementType == ElementEnum.Move) {
@@ -157,11 +157,12 @@ export class EventManager {
                             {
                                 w: offsetX - x,
                                 h: offsetY - y
+                                // points: [[offsetX, offsetY]]
                             },
                             "move"
                         );
                     } else if (this.Board._currentCanvasAction == CanvasActionEnum.Move) {
-                        CanvasHelper.clearCanvasArea(context, this.Board.Transform);
+                        this.Board.Helper.clearCanvasArea(context);
                         this.Board._tempSelectionArea.move(context, { x: offsetX - x, y: offsetY - y }, "move", false);
                         this.Board.ActiveObjects.forEach((ele) => {
                             ele.move(context, { x: offsetX - x, y: offsetY - y }, "move", false);
@@ -170,7 +171,7 @@ export class EventManager {
                         this.Board._currentCanvasAction == CanvasActionEnum.Resize &&
                         this.Board.CursorPosition
                     ) {
-                        CanvasHelper.clearCanvasArea(context, this.Board.Transform);
+                        this.Board.Helper.clearCanvasArea(context);
                         const {
                             x: px = 0,
                             y: py = 0,
@@ -189,7 +190,7 @@ export class EventManager {
                             "move",
                             false
                         );
-                        const cp = CanvasHelper.getCursorPosition(
+                        const cp = this.Board.Helper.getCursorPosition(
                             { x: offsetX, y: offsetY },
                             {
                                 id: this.Board._tempSelectionArea.id,
@@ -211,21 +212,25 @@ export class EventManager {
                             let uy = 0;
                             switch (cp) {
                                 case "br":
-                                case "tr":
                                     ox = ((ex - rx) * rw) / pw;
                                     oy = ((ey - ry) * rh) / ph;
                                     ux = px + ox;
                                     uy = py + oy;
                                     break;
+                                case "tr":
                                 case "tl":
                                 case "bl":
                                     ox = ((ex - px) * rw) / pw;
                                     oy = ((ey - py) * rh) / ph;
                                     ux = rx + ox;
                                     uy = ry + oy;
-                                    break;
                             }
-                            ele.update(context, { h: uh, w: uw, x: ux, y: uy }, "move", false);
+                            // if (ele.type == ElementEnum.Pencil) {
+                            //     ele.resize(context, { dx: ox, dy: oy }, "m", "move", false);
+                            // } else {
+                            //     ele.update(context, { h: uh, w: uw, x: ux, y: uy, points: [] }, "move", false);
+                            // }
+                            ele.update(context, { h: uh, w: uw, x: ux, y: uy, points: [] }, "move", false);
                         });
                     }
                 } else {
@@ -263,14 +268,17 @@ export class EventManager {
         } else if (this.Board.ElementType == ElementEnum.Move) {
             if (this.Board.SelectionElement) {
                 const hovered =
-                    CanvasHelper.isUnderMouse({ x: offsetX, y: offsetY }, this.Board.SelectionElement.getValues()) ||
-                    CanvasHelper.getCursorPosition(
+                    this.Board.Helper.isUnderMouse(
+                        { x: offsetX, y: offsetY },
+                        this.Board.SelectionElement.getValues()
+                    ) ||
+                    this.Board.Helper.getCursorPosition(
                         { x: offsetX, y: offsetY },
                         this.Board.SelectionElement.getValues(),
                         this.Board.SelectionElement.type
                     ) != "m";
                 if (hovered) {
-                    this.Board.CursorPosition = CanvasHelper.getCursorPosition(
+                    this.Board.CursorPosition = this.Board.Helper.getCursorPosition(
                         { x: offsetX, y: offsetY },
                         this.Board.SelectionElement.getValues(),
                         this.Board.SelectionElement.type
@@ -289,9 +297,9 @@ export class EventManager {
                     this.Board._tempSelectionArea = null;
                 }
             } else {
-                const ele = CanvasHelper.hoveredElement({ x: offsetX, y: offsetY }, this.Board.Elements);
+                const ele = this.Board.Helper.hoveredElement({ x: offsetX, y: offsetY }, this.Board.Elements);
                 if (ele) {
-                    this.Board.CursorPosition = CanvasHelper.getCursorPosition(
+                    this.Board.CursorPosition = this.Board.Helper.getCursorPosition(
                         { x: offsetX, y: offsetY },
                         ele.getValues(),
                         ele.type
@@ -344,7 +352,7 @@ export class EventManager {
                     this.Board.CursorPosition!,
                     "up"
                 );
-                const cp = CanvasHelper.getCursorPosition(
+                const cp = this.Board.Helper.getCursorPosition(
                     { x: offsetX, y: offsetY },
                     {
                         id: this.Board._tempSelectionArea.id,
@@ -366,12 +374,12 @@ export class EventManager {
                     let uy = 0;
                     switch (cp) {
                         case "br":
-                        case "tr":
                             ox = ((ex - rx) * rw) / pw;
                             oy = ((ey - ry) * rh) / ph;
                             ux = px + ox;
                             uy = py + oy;
                             break;
+                        case "tr":
                         case "tl":
                         case "bl":
                             ox = ((ex - px) * rw) / pw;
@@ -380,7 +388,7 @@ export class EventManager {
                             uy = ry + oy;
                             break;
                     }
-                    ele.update(context, { h: uh, w: uw, x: ux, y: uy }, "up", false);
+                    ele.update(context, { h: uh, w: uw, x: ux, y: uy, points: [] }, "up", false);
                 });
                 this.Board.SelectionElement = this.Board._tempSelectionArea;
                 context.closePath();
@@ -470,28 +478,40 @@ export class EventManager {
     }
 
     onWheelAction(e: WheelEvent) {
-        const oldX = this.Board.Transform.e;
-        const oldY = this.Board.Transform.f;
+        const oldX = this.Board.Transform.transformX;
+        const oldY = this.Board.Transform.transformY;
 
         const localX = e.clientX;
         const localY = e.clientY;
 
-        const previousScale = this.Board.Transform.a;
-        const newScale = Number(Math.abs(this.Board.Transform.a + e.deltaY * CANVAS_SCALING_FACTOR).toFixed(4));
+        const previousScale = this.Board.Transform.scaleX;
+        const newScale = Number(Math.abs(this.Board.Transform.scaleX + e.deltaY * CANVAS_SCALING_FACTOR).toFixed(4));
         const newX = localX - (localX - oldX) * (newScale / previousScale);
         const newY = localY - (localY - oldY) * (newScale / previousScale);
         if (newScale <= CANVAS_SCALING_LIMIT) {
             const newScale = CANVAS_SCALING_LIMIT;
             const newX = localX - (localX - oldX) * (newScale / previousScale);
             const newY = localY - (localY - oldY) * (newScale / previousScale);
-            this.Board.Transform = { ...this.Board.Transform, e: newX, f: newY, a: newScale, d: newScale };
+            this.Board.Transform = {
+                ...this.Board.Transform,
+                transformX: newX,
+                transformY: newY,
+                scaleX: newScale,
+                scaleY: newScale
+            };
             this.Board.Zoom = newScale * CANVAS_SCALING_MULTIPLIER;
             return;
         }
         if (isNaN(newX) || isNaN(newY) || !isFinite(newX) || !isFinite(newY)) {
             return;
         }
-        this.Board.Transform = { ...this.Board.Transform, e: newX, f: newY, a: newScale, d: newScale };
+        this.Board.Transform = {
+            ...this.Board.Transform,
+            transformX: newX,
+            transformY: newY,
+            scaleX: newScale,
+            scaleY: newScale
+        };
         this.Board.Zoom = newScale * CANVAS_SCALING_MULTIPLIER;
         this.Board.redrawBoard();
     }
@@ -513,7 +533,7 @@ export class EventManager {
         const { clientX: offsetX, clientY: offsetY } = e.touches[0];
         this.Board.PointerOrigin = { x: offsetX, y: offsetY };
         if (this.Board.ElementType == ElementEnum.Move) {
-            const ele = CanvasHelper.hoveredElement({ x: offsetX, y: offsetY }, this.Board.Elements);
+            const ele = this.Board.Helper.hoveredElement({ x: offsetX, y: offsetY }, this.Board.Elements);
             if (ele) {
                 this.Board.Elements = this.Board.Elements.filter((e) => e.id != ele.id);
                 this.Board.redrawBoard();
