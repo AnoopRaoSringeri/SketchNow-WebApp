@@ -40,8 +40,8 @@ export class CanvasBoard implements ICanvas {
     private _activeObjects: ICanvasObjectWithId[] = [];
     private _hoveredObject: ICanvasObjectWithId | null = null;
 
-    _elementType: ElementEnum = ElementEnum.Move;
-    _isElementSelectorLocked = false;
+    _elementType: ElementEnum = ElementEnum.Pencil;
+    _isElementSelectorLocked = true;
     _currentCanvasAction: CanvasActionEnum = CanvasActionEnum.Select;
     _zoom = 100;
     _style: IObjectStyle = DefaultStyle;
@@ -54,6 +54,8 @@ export class CanvasBoard implements ICanvas {
     _applySelectionStyle = true;
 
     Helper: CanvasHelper;
+
+    text: ICanvasObjectWithId | null = null;
 
     constructor() {
         this.EventManager = new EventManager(this);
@@ -75,7 +77,11 @@ export class CanvasBoard implements ICanvas {
             _canvasTransform: observable,
             Transform: computed,
             _selectionArea: observable,
-            SelectionElement: computed
+            SelectionElement: computed,
+            NewOrder: computed,
+            Elements: computed,
+            text: observable,
+            Text: computed
         });
     }
 
@@ -110,6 +116,7 @@ export class CanvasBoard implements ICanvas {
 
     set ElementType(type: ElementEnum) {
         if (type != this._elementType) {
+            this.Text = null;
             this._elementType = type;
             this._activeObjects = [];
             this.unSelectElements();
@@ -198,7 +205,7 @@ export class CanvasBoard implements ICanvas {
     }
 
     get Elements() {
-        return this._elements;
+        return this._elements.sort((a, b) => a.order - b.order);
     }
 
     set Elements(objects: ICanvasObjectWithId[]) {
@@ -243,6 +250,33 @@ export class CanvasBoard implements ICanvas {
 
     set IsElementSelectorLocked(value: boolean) {
         this._isElementSelectorLocked = value;
+    }
+
+    get NewOrder() {
+        return this.Elements.length + 1;
+    }
+
+    get Text() {
+        return this.text;
+    }
+
+    set Text(value: ICanvasObjectWithId | null) {
+        this.text = value;
+    }
+
+    updateText(value: string) {
+        if (!this.CanvasCopy || !this.Text) {
+            return;
+        }
+        const context = this.CanvasCopy.getContext("2d");
+        if (!context) {
+            return;
+        }
+        this.Text.update(context, { value: value }, "down");
+        this.PointerOrigin = null;
+        this._elements.push(this.Text);
+        this.Text = null;
+        this.redrawBoard();
     }
 
     init({ width, height }: Size) {
@@ -354,7 +388,10 @@ export class CanvasBoard implements ICanvas {
         }
         const elementToCopy = this.Elements.find((e) => e.id == id);
         if (elementToCopy) {
-            const copyElement = CavasObjectMap[elementToCopy.type]({ ...elementToCopy, id: uuid() }, this);
+            const copyElement = CavasObjectMap[elementToCopy.type](
+                { ...elementToCopy, id: uuid(), order: this.NewOrder },
+                this
+            );
             copyElement.move(context, { x: 0, y: 0 }, "down");
             copyElement.move(context, { x: 40, y: 40 }, "up");
             context.closePath();
@@ -378,8 +415,8 @@ export class CanvasBoard implements ICanvas {
         const elementsToCopy = this.Elements.filter((e) => this.SelectedElements.find((se) => se.id == e.id) != null);
         this.Helper.clearCanvasArea(context);
         const copiedItems: ICanvasObjectWithId[] = [];
-        elementsToCopy.forEach((ele) => {
-            const copyElement = CavasObjectMap[ele.type]({ ...ele, id: uuid() }, this);
+        elementsToCopy.forEach((ele, i) => {
+            const copyElement = CavasObjectMap[ele.type]({ ...ele, id: uuid(), order: this.NewOrder + i }, this);
             copyElement.move(context, { x: 0, y: 0 }, "down", false);
             copyElement.move(context, { x: 40, y: 40 }, "up", false);
             copiedItems.push(copyElement);

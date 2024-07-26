@@ -113,20 +113,38 @@ export class EventManager {
                 }
             }
         } else {
-            const newObj = CavasObjectMap[this.Board.ElementType](
-                {
-                    x: offsetX,
-                    y: offsetY,
-                    h: 0,
-                    w: 0,
-                    points: [[offsetX, offsetY]],
-                    id: uuid(),
-                    style: this.Board.Style
-                },
-                this.Board
-            );
-            newObj.create(context);
-            this.Board.ActiveObjects.push(newObj);
+            if (this.Board.ElementType == ElementEnum.Text) {
+                if (!this.Board.Text) {
+                    this.Board.Text = CavasObjectMap[ElementEnum.Text](
+                        {
+                            x: offsetX,
+                            y: offsetY,
+                            value: "",
+                            id: uuid(),
+                            style: this.Board.Style,
+                            order: this.Board.NewOrder
+                        },
+                        this.Board
+                    );
+                    this.Board.Text.create(context);
+                }
+            } else {
+                const newObj = CavasObjectMap[this.Board.ElementType](
+                    {
+                        x: offsetX,
+                        y: offsetY,
+                        h: 0,
+                        w: 0,
+                        points: [[offsetX, offsetY]],
+                        id: uuid(),
+                        style: this.Board.Style,
+                        order: this.Board.NewOrder
+                    },
+                    this.Board
+                );
+                newObj.create(context);
+                this.Board.ActiveObjects.push(newObj);
+            }
         }
     }
 
@@ -551,7 +569,8 @@ export class EventManager {
                     w: 0,
                     points: [[offsetX, offsetY]],
                     id: uuid(),
-                    style: this.Board.Style
+                    style: this.Board.Style,
+                    order: this.Board.NewOrder
                 },
                 this.Board
             );

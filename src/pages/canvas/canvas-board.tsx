@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
 import { useStore } from "@/api-stores/store-provider";
-// import { OptionsWrapper } from "@/components/mini-components/options-wrapper";
 import { Loader } from "@/components/ui/loader";
 import { useLayout } from "@/hooks/layout-provider";
 import { useCanvas } from "@/hooks/use-canvas";
 
 import CanvasOptions from "./canvas-options";
+import { TextEditorWrapper } from "./text-editor";
 
 export const CanvasBoard = observer(function CanvasBoard() {
     const { setInitiallyVisible } = useLayout();
@@ -52,7 +52,7 @@ export const CanvasBoard = observer(function CanvasBoard() {
         <>
             <Loader loading={isLoading} />
             <CanvasOptions name={sketchName} />
-            {/* <OptionsWrapper /> */}
+            <TextEditorWrapper />
             <canvas id="canvas-board" className="absolute z-10 overscroll-none" ref={canvasBoard.CanvasRef}></canvas>
             <canvas
                 id="canvas-board-copy"

@@ -11,6 +11,7 @@ export interface IObjectValue {
     ea: number;
     ro: number;
     points: [number, number][];
+    value: string;
     style: IObjectStyle;
 }
 
@@ -19,8 +20,26 @@ export interface IObjectStyle {
     fillColor: string;
     strokeWidth: number;
     opacity: number;
+    font: Font | null;
 }
 
+export interface Font {
+    color: string;
+    style: string;
+    varient: string;
+    weight: number | string;
+    size: number | string;
+    family:
+        | string
+        | "caption"
+        | "icon"
+        | "menu"
+        | "message-box"
+        | "small-caption"
+        | "status-bar"
+        | "initial"
+        | "inherit";
+}
 export interface IObjectValueWithId extends Partial<IObjectValue> {
     id: string;
 }
@@ -64,6 +83,7 @@ export interface ObjectOptions {
 }
 export interface ICanvasObject extends Partial<IObjectValue>, ICanvasObjectMethods, ObjectOptions {
     type: ElementEnum;
+    order: number;
     readonly Board: CanvasBoard;
 }
 
@@ -97,6 +117,7 @@ export enum ElementEnum {
     Rectangle = "rectangle",
     Circle = "circle",
     Pencil = "pencil",
+    Text = "text",
     Move = "move"
 }
 

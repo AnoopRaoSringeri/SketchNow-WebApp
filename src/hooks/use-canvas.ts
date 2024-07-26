@@ -90,14 +90,20 @@ export function useCanvas(canvasId: string) {
     }
 
     function onMouseDown(e: MouseEvent) {
+        e.preventDefault();
+        e.stopPropagation();
         canvasBoard?.onMouseDown(e);
     }
 
     function onTouchStart(e: globalThis.TouchEvent) {
+        e.preventDefault();
+        e.stopPropagation();
         canvasBoard?.onTouchStart(e);
     }
 
     function onMouseMove(e: MouseEvent) {
+        e.preventDefault();
+        e.stopPropagation();
         canvasBoard?.onMouseMove(e);
     }
 

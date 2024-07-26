@@ -22,7 +22,8 @@ export class Rectangle implements ICanvasObjectWithId {
     type: ElementEnum = ElementEnum.Rectangle;
     id = uuid();
     style = DefaultStyle;
-    constructor({ x, y, h, w, id, style }: PartialCanvasObject, parent: CanvasBoard) {
+    order = 0;
+    constructor({ x, y, h, w, id, style, order = 0 }: PartialCanvasObject, parent: CanvasBoard) {
         this.x = x ?? 0;
         this.y = y ?? 0;
         this.h = h ?? 0;
@@ -30,6 +31,7 @@ export class Rectangle implements ICanvasObjectWithId {
         this.id = id;
         this.style = { ...(style ?? DefaultStyle) };
         this.Board = parent;
+        this.order = order;
         makeObservable(this, {
             _isDragging: observable,
             IsDragging: computed
@@ -266,7 +268,8 @@ export class Rectangle implements ICanvasObjectWithId {
             w: this.w,
             x: this.x,
             y: this.y,
-            style: this.style
+            style: this.style,
+            order: this.order
         };
     }
 

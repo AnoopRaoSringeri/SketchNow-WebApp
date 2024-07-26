@@ -5,13 +5,13 @@ import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
 import { useStore } from "@/api-stores/store-provider";
-import { CanvasStyleEditor } from "@/pages/mini-components/canvas-style-editor";
-import { ElementStyleEditor } from "@/pages/mini-components/element-style-editor";
-import { ZoomController } from "@/pages/mini-components/zoom-controller";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { useCanvas } from "@/hooks/use-canvas";
+import { CanvasStyleEditor } from "@/pages/mini-components/canvas-style-editor";
+import { ElementStyleEditor } from "@/pages/mini-components/element-style-editor";
+import { ZoomController } from "@/pages/mini-components/zoom-controller";
 import { ElementEnum } from "@/types/custom-canvas";
 import { Option } from "@/types/layout";
 
@@ -23,7 +23,8 @@ const LeftOptionLists: Option[] = [
     { icon: "RectangleHorizontal", value: ElementEnum.Rectangle },
     { icon: "Circle", value: ElementEnum.Circle },
     { icon: "Square", value: ElementEnum.Square },
-    { icon: "Minus", value: ElementEnum.Line }
+    { icon: "Minus", value: ElementEnum.Line },
+    { icon: "Type", value: ElementEnum.Text }
 ];
 
 const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }) {

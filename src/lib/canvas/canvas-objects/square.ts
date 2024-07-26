@@ -21,13 +21,15 @@ export class Square implements ICanvasObjectWithId {
     type: ElementEnum = ElementEnum.Square;
     id = uuid();
     style = DefaultStyle;
-    constructor({ x, y, h, id, style }: PartialCanvasObject, parent: CanvasBoard) {
+    order = 0;
+    constructor({ x, y, h, id, style, order }: PartialCanvasObject, parent: CanvasBoard) {
         this.x = x ?? 0;
         this.y = y ?? 0;
         this.h = h ?? 0;
         this.id = id;
         this.style = { ...(style ?? DefaultStyle) };
         this.Board = parent;
+        this.order = order ?? 0;
     }
     x = 0;
     y = 0;
@@ -257,7 +259,8 @@ export class Square implements ICanvasObjectWithId {
             w: this.h,
             x: this.x,
             y: this.y,
-            style: this.style
+            style: this.style,
+            order: this.order
         };
     }
 

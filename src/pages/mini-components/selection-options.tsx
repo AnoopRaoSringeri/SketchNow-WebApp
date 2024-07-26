@@ -28,7 +28,7 @@ export const SelectionOptions = observer(function SelectionOptions() {
     }
 
     return (
-        <div className=" flex ">
+        <div className=" flex gap-4">
             {/* <div className="absolute z-[100] flex " style={{ top: ay - 30, left: ax + w * canvasBoard.Transform.a - 68 }}> */}
             <Button size="xs" variant="ghost" onClick={copyElement}>
                 <Copy size={20} />

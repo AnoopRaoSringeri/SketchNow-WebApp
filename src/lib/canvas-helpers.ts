@@ -3,6 +3,7 @@ import {
     CanvasObject,
     CursorPosition,
     ElementEnum,
+    Font,
     ICanvasObjectWithId,
     ICanvasTransform,
     IObjectStyle,
@@ -12,11 +13,29 @@ import {
 
 import { CanvasBoard } from "./canvas/canvas-board";
 
+export const DefaultFont: Font = {
+    color: "white",
+    style: "normal",
+    varient: "normal",
+    weight: 200,
+    size: 30,
+    family: "Arial"
+};
+
 export const DefaultStyle: IObjectStyle = {
     fillColor: "transparent",
     strokeStyle: "#fff",
     strokeWidth: 1,
-    opacity: 100
+    opacity: 100,
+    font: null
+};
+
+export const SelectionStyle: IObjectStyle = {
+    fillColor: "#ccffff10",
+    strokeStyle: "#ccffff",
+    strokeWidth: 0.1,
+    opacity: 100,
+    font: null
 };
 
 const HOVER_OFFSET = 10;
@@ -30,7 +49,7 @@ export const CANVAS_SCALING_LIMIT = 0.001;
 export const CANVAS_SCALING_MULTIPLIER = 100;
 export const CANVAS_ZOOM_IN_OUT_FACTOR = 0.05;
 
-export const MIN_INTERVAL = 1;
+export const MIN_INTERVAL = 10;
 
 export const SELECTION_ELEMENT_ID = "select-element";
 
@@ -41,13 +60,6 @@ export const DEFAULT_TRANSFORM: ICanvasTransform = {
     scaleY: 1,
     transformX: 0,
     transformY: 0
-};
-
-export const SelectionStyle: IObjectStyle = {
-    fillColor: "#ccffff10",
-    strokeStyle: "#ccffff",
-    strokeWidth: 0.1,
-    opacity: 100
 };
 
 let CanvasWorker: Worker | null = null;
@@ -288,19 +300,43 @@ export class CanvasHelper {
 
     static applyStyles(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, style: IObjectStyle) {
         ctx.save();
-        const { fillColor, strokeStyle, strokeWidth, opacity } = style;
+        const { fillColor, strokeStyle, strokeWidth, opacity, font } = style;
         ctx.fillStyle = fillColor;
         ctx.strokeStyle = strokeStyle;
         ctx.lineWidth = strokeWidth;
         ctx.globalAlpha = opacity / 100;
         ctx.lineCap = "round";
+        ctx.font = this.getFont(font);
+        if (font) {
+            ctx.fillStyle = font.color;
+            ctx.textBaseline = "top";
+        }
+    }
+
+    static getFont(font: Font | null) {
+        if (font) {
+            const { size, family, style: fStyle, varient, weight } = font;
+            return `${fStyle} ${varient} ${weight} ${size}px ${family} `;
+        } else {
+            return "";
+        }
+    }
+
+    static getFontStyle(font: Font | null) {
+        if (font) {
+            const { color } = font;
+            return { font: this.getFont(font), color: color };
+        } else {
+            return {};
+        }
     }
 
     static applySelectedStyle(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
+        const { a } = ctx.getTransform();
         ctx.save();
         ctx.strokeStyle = "#00ffff";
         ctx.fillStyle = "#00ffff";
-        ctx.lineWidth = 0.5;
+        ctx.lineWidth = 0.5 / a;
     }
 
     static applySelection(
@@ -310,7 +346,7 @@ export class CanvasHelper {
     ) {
         const { a } = ctx.getTransform();
         const radius = SELECTOR_POINT_RADIUS / a;
-        const gutter = withGutter ? GUTTER : 0;
+        const gutter = (withGutter ? GUTTER : 0) / a;
         CanvasHelper.applySelectedStyle(ctx);
         ctx.strokeRect(x - gutter, y - gutter, w + gutter * 2, h + gutter * 2);
 

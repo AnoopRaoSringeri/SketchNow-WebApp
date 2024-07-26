@@ -20,6 +20,7 @@ export class Circle implements ICanvasObjectWithId {
     type: ElementEnum = ElementEnum.Circle;
     id = uuid();
     style = DefaultStyle;
+    order = 0;
     constructor(v: PartialCanvasObject, parent: CanvasBoard) {
         this.Board = parent;
         this.x = v.x ?? 0;
@@ -31,6 +32,7 @@ export class Circle implements ICanvasObjectWithId {
         this.ea = v.ea ?? 2 * Math.PI;
         this.id = v.id;
         this.style = { ...(v.style ?? DefaultStyle) };
+        this.order = v.order ?? 0;
     }
     x = 0;
     y = 0;
@@ -78,6 +80,8 @@ export class Circle implements ICanvasObjectWithId {
         const { x: ax, y: ay, h: rY, w: rX } = CanvasHelper.getBoundingArea(this.type, this.getValues());
         ctx.ellipse(ax, ay, rX, rY, this.ro, this.sa, this.ea);
         ctx.stroke();
+        ctx.fill();
+        ctx.restore();
     }
 
     select({ x = this.x, y = this.y, w = this.w, h = this.h }: Partial<IObjectValue>) {
@@ -137,6 +141,7 @@ export class Circle implements ICanvasObjectWithId {
         ctx.ellipse(ax, ay, rX, rY, this.ro, this.sa, this.ea);
         ctx.stroke();
         ctx.fill();
+        ctx.restore();
     }
 
     move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
@@ -186,7 +191,8 @@ export class Circle implements ICanvasObjectWithId {
             ea: this.ea,
             x: this.x,
             y: this.y,
-            style: this.style
+            style: this.style,
+            order: this.order
         };
     }
 

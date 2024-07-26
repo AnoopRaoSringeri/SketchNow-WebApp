@@ -53,15 +53,16 @@ function getSvgPathFromStroke(points: number[][], closed = true) {
 }
 export class Pencil implements ICanvasObjectWithId {
     readonly Board: CanvasBoard;
-
     type: ElementEnum = ElementEnum.Pencil;
     id = uuid();
     style = DefaultStyle;
+    order = 0;
     constructor(v: PartialCanvasObject, parent: CanvasBoard) {
         this.points = [...(v.points ?? [])];
         this.id = v.id;
         this.style = { ...(v.style ?? DefaultStyle) };
         this.Board = parent;
+        this.order = v.order ?? 0;
     }
     points: [number, number][] = [];
 
@@ -232,7 +233,8 @@ export class Pencil implements ICanvasObjectWithId {
             type: this.type,
             id: this.id,
             points: this.points,
-            style: this.style
+            style: this.style,
+            order: this.order
         };
     }
 
