@@ -40,6 +40,8 @@ export const TextEditorWrapper = observer(function TextEditorWrapper() {
     }
 
     const { x = 0, y = 0, style = DefaultStyle } = canvasBoard.Text?.getValues() ?? {};
+
+    const { ax, ay } = CanvasHelper.getAbsolutePosition({ x, y }, canvasBoard.Transform);
     const { font, ...rest } = style;
     return (
         <div className="absolute z-50 flex size-full overflow-hidden bg-transparent">
@@ -48,8 +50,8 @@ export const TextEditorWrapper = observer(function TextEditorWrapper() {
                 id="canvas-text"
                 className="absolute  m-0 block resize-none overflow-hidden whitespace-pre border-none bg-transparent p-0 outline-none focus:border-none focus:ring-0 focus:ring-offset-0 focus-visible:border-none focus-visible:ring-0 focus-visible:ring-offset-0 "
                 style={{
-                    top: y - Number(font?.size ?? 0) * 0.2,
-                    left: x,
+                    top: ay - Number(font?.size ?? 0) * 0.2,
+                    left: ax,
                     ...CanvasHelper.getFontStyle(font),
                     ...rest
                 }}

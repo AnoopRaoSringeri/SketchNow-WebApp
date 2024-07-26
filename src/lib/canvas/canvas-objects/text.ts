@@ -1,6 +1,6 @@
 import { v4 as uuid } from "uuid";
 
-import { CanvasHelper, DefaultStyle } from "@/lib/canvas-helpers";
+import { CanvasHelper, DefaultFont, DefaultStyle } from "@/lib/canvas-helpers";
 import { Delta, Position } from "@/types/canvas";
 import {
     CursorPosition,
@@ -28,6 +28,7 @@ export class Text implements ICanvasObjectWithId {
         this.value = v.value ?? "";
         this.id = v.id;
         this.style = { ...(v.style ?? DefaultStyle) };
+        this.style.font = this.style.font ?? DefaultFont;
         this.Board = parent;
         this.order = v.order ?? 0;
     }
