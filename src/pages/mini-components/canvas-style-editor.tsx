@@ -13,11 +13,12 @@ export const CanvasStyleEditor = observer(function CanvasStyleEditor() {
     const { canvasBoard } = useCanvas(id ?? "new");
     const canvasStyle = canvasBoard.Style;
 
-    return (
+    const options = OptionRegistry[canvasBoard.ElementType];
+    return options.length > 0 ? (
         <div className="absolute left-5 top-20 z-[100]  flex  flex-row items-center gap-1">
             <ScrollArea>
                 <div className="flex h-full w-[260px] flex-col gap-4 rounded-sm bg-slate-500 p-5">
-                    {OptionRegistry[canvasBoard.ElementType].map((o, i) => (
+                    {options.map((o, i) => (
                         <Renderer
                             key={i}
                             {...o}
@@ -29,5 +30,5 @@ export const CanvasStyleEditor = observer(function CanvasStyleEditor() {
                 </div>
             </ScrollArea>
         </div>
-    );
+    ) : null;
 });

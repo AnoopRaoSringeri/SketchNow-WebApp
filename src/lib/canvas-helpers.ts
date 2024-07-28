@@ -49,7 +49,7 @@ export const CANVAS_SCALING_LIMIT = 0.001;
 export const CANVAS_SCALING_MULTIPLIER = 100;
 export const CANVAS_ZOOM_IN_OUT_FACTOR = 0.05;
 
-export const MIN_INTERVAL = 10;
+export const MIN_INTERVAL = 15;
 
 export const SELECTION_ELEMENT_ID = "select-element";
 
@@ -95,6 +95,7 @@ export class CanvasHelper {
             case ElementEnum.Square:
             case ElementEnum.Circle:
             case ElementEnum.Rectangle:
+            case ElementEnum.Image:
                 return x >= ucx - hOffSet && x <= ucx + hOffSet && y >= ucy - hOffSet && y <= ucy + hOffSet
                     ? "tl"
                     : x >= ucx - hOffSet && x <= ucx + hOffSet && y >= uh - hOffSet && y <= uh + hOffSet
@@ -196,6 +197,7 @@ export class CanvasHelper {
             case ElementEnum.Circle:
             case ElementEnum.Rectangle:
             case ElementEnum.Square:
+            case ElementEnum.Image:
                 break;
             case ElementEnum.Pencil: {
                 let lx = Number.POSITIVE_INFINITY;
@@ -241,6 +243,10 @@ export class CanvasHelper {
         return { offsetX: (x - e) / a, offsetY: (y - f) / a };
     }
 
+    static getCurrentPosition({ x, y }: Position, { transformX: e, transformY: f, scaleX: a }: ICanvasTransform) {
+        return { offsetX: (x - e) / a, offsetY: (y - f) / a };
+    }
+
     static getAbsolutePosition({ x, y }: Position, { transformX: e, transformY: f, scaleX: a }: ICanvasTransform) {
         return { x, y, ax: x * a + e, ay: y * a + f };
     }
@@ -256,6 +262,7 @@ export class CanvasHelper {
                 case ElementEnum.Circle:
                 case ElementEnum.Square:
                 case ElementEnum.Rectangle:
+                case ElementEnum.Image:
                     x = Math.min(x, ex);
                     y = Math.min(y, ey);
                     h = Math.max(h, eh + ey);

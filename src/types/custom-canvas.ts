@@ -118,6 +118,7 @@ export enum ElementEnum {
     Circle = "circle",
     Pencil = "pencil",
     Text = "text",
+    Image = "image",
     Move = "move"
 }
 

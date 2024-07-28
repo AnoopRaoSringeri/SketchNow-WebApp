@@ -24,7 +24,8 @@ const LeftOptionLists: Option[] = [
     { icon: "Circle", value: ElementEnum.Circle },
     { icon: "Square", value: ElementEnum.Square },
     { icon: "Minus", value: ElementEnum.Line },
-    { icon: "Type", value: ElementEnum.Text }
+    { icon: "Type", value: ElementEnum.Text },
+    { icon: "ImagePlus", value: ElementEnum.Image }
 ];
 
 const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }) {
@@ -39,6 +40,7 @@ const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }
     }, [name]);
 
     const saveBoard = async () => {
+        console.log(canvasBoard.Canvas.toDataURL());
         if (id && id != "new") {
             await sketchStore.UpdateSketch(id, canvasBoard.toJSON(), sketchName);
             toast.success("Sketch saved successfully");

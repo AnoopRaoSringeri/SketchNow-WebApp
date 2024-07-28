@@ -56,5 +56,6 @@ export const OptionRegistry: OptionRegistryType = {
         { label: "Font", optionKey: "font", type: OptionTypeEnum.Font, value: DefaultFont }
     ],
     [ElementEnum.Pencil]: [...BaseOptions],
-    [ElementEnum.Move]: []
+    [ElementEnum.Move]: [],
+    [ElementEnum.Image]: []
 };

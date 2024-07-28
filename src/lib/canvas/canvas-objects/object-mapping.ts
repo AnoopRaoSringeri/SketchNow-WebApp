@@ -2,6 +2,7 @@ import { ElementEnum, ICanvasObjectWithId, PartialCanvasObject } from "@/types/c
 
 import { CanvasBoard } from "../canvas-board";
 import { Circle } from "./circle";
+import { CanvasImage } from "./image";
 import { Line } from "./line";
 import { Pencil } from "./pencil";
 import { Rectangle } from "./rectangle";
@@ -17,6 +18,7 @@ export const CavasObjectMap: {
     [ElementEnum.Circle]: (initValues, parent) => new Circle(initValues, parent),
     [ElementEnum.Pencil]: (initValues, parent) => new Pencil(initValues, parent),
     [ElementEnum.Text]: (initValues, parent) => new Text(initValues, parent),
+    [ElementEnum.Image]: (initValues, parent) => new CanvasImage(initValues, parent),
     [ElementEnum.Move]: function (): ICanvasObjectWithId {
         throw new Error("Function not implemented.");
     }

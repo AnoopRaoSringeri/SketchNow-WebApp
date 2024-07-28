@@ -40,7 +40,7 @@ export class CanvasBoard implements ICanvas {
     private _activeObjects: ICanvasObjectWithId[] = [];
     private _hoveredObject: ICanvasObjectWithId | null = null;
 
-    _elementType: ElementEnum = ElementEnum.Pencil;
+    _elementType: ElementEnum = ElementEnum.Move;
     _isElementSelectorLocked = true;
     _currentCanvasAction: CanvasActionEnum = CanvasActionEnum.Select;
     _zoom = 100;
@@ -56,6 +56,8 @@ export class CanvasBoard implements ICanvas {
     Helper: CanvasHelper;
 
     text: ICanvasObjectWithId | null = null;
+
+    image: ICanvasObjectWithId | null = null;
 
     constructor() {
         this.EventManager = new EventManager(this);
@@ -81,7 +83,9 @@ export class CanvasBoard implements ICanvas {
             NewOrder: computed,
             Elements: computed,
             text: observable,
-            Text: computed
+            Text: computed,
+            image: observable,
+            Image: computed
         });
     }
 
@@ -264,6 +268,14 @@ export class CanvasBoard implements ICanvas {
         this.text = value;
     }
 
+    get Image() {
+        return this.image;
+    }
+
+    set Image(value: ICanvasObjectWithId | null) {
+        this.image = value;
+    }
+
     updateText(value: string) {
         if (!this.CanvasCopy || !this.Text) {
             return;
@@ -277,6 +289,37 @@ export class CanvasBoard implements ICanvas {
         this._elements.push(this.Text);
         this.Text = null;
         this.redrawBoard();
+    }
+
+    uploadImage(e: React.ChangeEvent<HTMLInputElement>) {
+        if (!e.target.files || !this.CanvasCopy) {
+            return;
+        }
+        const ctx = this.CanvasCopy.getContext("2d");
+        if (!ctx) {
+            return;
+        }
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        // Read in the image file as a data URL.
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            this.drawImage(event, ctx);
+        };
+    }
+
+    drawImage(event: ProgressEvent<FileReader>, ctx: CanvasRenderingContext2D) {
+        if (
+            event.target?.readyState == FileReader.DONE &&
+            event.target.result &&
+            typeof event.target.result === "string"
+        ) {
+            this.Image?.update(ctx, { value: event.target.result }, "up");
+            this.PointerOrigin = null;
+            this._elements.push(this.Image!);
+            this.Image = null;
+            this.redrawBoard();
+        }
     }
 
     init({ width, height }: Size) {
@@ -532,7 +575,7 @@ export class CanvasBoard implements ICanvas {
     }
 
     redrawBoard() {
-        window.requestAnimationFrame((timestamp) => {
+        const fId = window.requestAnimationFrame((timestamp) => {
             if (timestamp - this._lastTimestamp >= MIN_INTERVAL) {
                 if (!CanvasWorker) {
                     return;
@@ -585,6 +628,10 @@ export class CanvasBoard implements ICanvas {
                 this._lastTimestamp = timestamp;
             }
         });
+
+        setTimeout(() => {
+            window.cancelAnimationFrame(fId);
+        }, 100);
     }
 
     dispose() {

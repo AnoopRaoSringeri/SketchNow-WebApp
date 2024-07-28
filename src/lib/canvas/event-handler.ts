@@ -128,6 +128,19 @@ export class EventManager {
                     );
                     this.Board.Text.create(context);
                 }
+            } else if (this.Board.ElementType == ElementEnum.Image) {
+                this.Board.Image = CavasObjectMap[ElementEnum.Image](
+                    {
+                        x: offsetX,
+                        y: offsetY,
+                        value: "",
+                        id: uuid(),
+                        style: this.Board.Style,
+                        order: this.Board.NewOrder
+                    },
+                    this.Board
+                );
+                this.Board.Image.create(context);
             } else {
                 const newObj = CavasObjectMap[this.Board.ElementType](
                     {
