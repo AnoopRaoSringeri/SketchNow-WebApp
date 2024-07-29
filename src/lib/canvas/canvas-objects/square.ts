@@ -82,13 +82,13 @@ export class Square implements ICanvasObjectWithId {
         if (this.IsSelected) {
             this.select({ x: this.x, y: this.y });
         }
+        ctx.restore();
     }
 
     create(ctx: CanvasRenderingContext2D) {
         CanvasHelper.applyStyles(ctx, this.style);
         ctx.strokeRect(this.x, this.y, this.h, this.h);
         ctx.fillRect(this.x, this.y, this.h, this.h);
-        ctx.closePath();
     }
 
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {

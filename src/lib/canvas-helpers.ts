@@ -247,6 +247,10 @@ export class CanvasHelper {
         return { offsetX: (x - e) / a, offsetY: (y - f) / a };
     }
 
+    static getTransformedSize({ height, width }: Size, { transformX: e, transformY: f, scaleX: a }: ICanvasTransform) {
+        return { width: width / (a + 1) / a, height: height / (a + 1) / a };
+    }
+
     static getAbsolutePosition({ x, y }: Position, { transformX: e, transformY: f, scaleX: a }: ICanvasTransform) {
         return { x, y, ax: x * a + e, ay: y * a + f };
     }

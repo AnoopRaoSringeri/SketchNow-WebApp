@@ -86,7 +86,6 @@ export class Text implements ICanvasObjectWithId {
     draw(ctx: CanvasRenderingContext2D) {
         CanvasHelper.applyStyles(ctx, this.style);
         ctx.fillText(this.value, this.x, this.y);
-        // ctx.strokeText(this.value, this.x, this.y);
         ctx.restore();
     }
 

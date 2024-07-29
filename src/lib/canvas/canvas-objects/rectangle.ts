@@ -74,13 +74,13 @@ export class Rectangle implements ICanvasObjectWithId {
         if (this.IsSelected) {
             this.select({ x: this.x, y: this.y });
         }
+        ctx.restore();
     }
 
     create(ctx: CanvasRenderingContext2D) {
         CanvasHelper.applyStyles(ctx, this.style);
         ctx.strokeRect(this.x, this.y, this.w, this.h);
         ctx.fillRect(this.x, this.y, this.w, this.h);
-        ctx.closePath();
     }
 
     select({ x = this.x, y = this.y, h = this.h, w = this.w }: Partial<IObjectValue>) {

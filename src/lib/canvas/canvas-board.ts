@@ -593,7 +593,7 @@ export class CanvasBoard implements ICanvas {
                         if (this.SelectionElement) {
                             this.SelectionElement.draw(contextCopy);
                         }
-                        // contextCopy.restore();
+                        contextCopy.restore();
                     }
                 }
                 const context = this.Canvas.getContext("2d");
@@ -605,7 +605,7 @@ export class CanvasBoard implements ICanvas {
                     this.Elements.forEach((ele) => {
                         ele.draw(context);
                     });
-                    // context.restore();
+                    context.restore();
                 }
                 CanvasWorker.onmessage = function (e) {
                     console.log(e.data);

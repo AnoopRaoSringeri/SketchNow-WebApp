@@ -72,6 +72,7 @@ export class Circle implements ICanvasObjectWithId {
         if (this.IsSelected) {
             this.select({ x: this.x, y: this.y });
         }
+        ctx.restore();
     }
 
     create(ctx: CanvasRenderingContext2D) {
@@ -81,7 +82,6 @@ export class Circle implements ICanvasObjectWithId {
         ctx.ellipse(ax, ay, rX, rY, this.ro, this.sa, this.ea);
         ctx.stroke();
         ctx.fill();
-        ctx.restore();
     }
 
     select({ x = this.x, y = this.y, w = this.w, h = this.h }: Partial<IObjectValue>) {
