@@ -23,7 +23,6 @@ export class Table implements ICanvasObjectWithId {
     id = uuid();
     style = DefaultStyle;
     order = 0;
-    image = new Image();
     constructor(v: PartialCanvasObject, parent: CanvasBoard) {
         this.x = v.x ?? 0;
         this.y = v.y ?? 0;
@@ -165,8 +164,7 @@ export class Table implements ICanvasObjectWithId {
         }
         this.IsDragging = true;
         const offsetX = x + this.tmpX;
-        const offsetY = y + this.tmpX;
-        ctx.drawImage(this.image, offsetX, offsetY, this.w, this.h);
+        const offsetY = y + this.tmpY;
         this.select({ x: offsetX, y: offsetY });
         ctx.restore();
         this.x = offsetX;
@@ -216,8 +214,8 @@ export class Table implements ICanvasObjectWithId {
         this.IsDragging = true;
         let w = dx;
         let h = dy;
-        let y = this.tmpX;
-        let x = this.tmpY;
+        let y = this.tmpY;
+        let x = this.tmpX;
         switch (cPos) {
             case "tl":
                 x = x + w;
@@ -294,7 +292,6 @@ export class Table implements ICanvasObjectWithId {
             x = x + w;
             w = Math.abs(w);
         }
-        ctx.drawImage(this.image, x, y, w, h);
 
         ctx.restore();
 

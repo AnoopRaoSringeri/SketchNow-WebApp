@@ -2,6 +2,8 @@ import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
 
 import { useStore } from "@/api-stores/store-provider";
+import { Button } from "@/components/ui/button";
+import Icon from "@/components/ui/icon";
 import { Loader } from "@/components/ui/loader";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -18,6 +20,7 @@ export const TableRenderer = observer(function TableRenderer({
     id: string;
     board: CanvasBoard;
 }) {
+    const [isLocked, setIsLocked] = useState(true);
     const table = board.getTable(id);
     const { x = 0, y = 0, h = 0, w = 0 } = table.getValues();
     const [loading, setLoading] = useState<boolean>(false);
@@ -60,9 +63,22 @@ export const TableRenderer = observer(function TableRenderer({
 
     return (
         <div style={style}>
+            <Button
+                onClick={() => setIsLocked((pre) => !pre)}
+                className="absolute bottom-5 right-5 z-[60]"
+                size="icon"
+                variant="ghost"
+            >
+                {isLocked ? <Icon name="LockOpen" /> : <Icon name="Lock" />}
+            </Button>
             <Loader loading={loading} />
             {data.length > 0 ? (
-                <ScrollArea className="z-50 size-full border border-gray-50/10">
+                <ScrollArea
+                    className="size-full border border-gray-50/10"
+                    style={{
+                        zIndex: isLocked ? 0 : 50
+                    }}
+                >
                     <Table>
                         <TableHeader>
                             <TableRow>
