@@ -1,3 +1,4 @@
+import { makeObservable } from "mobx";
 import { v4 as uuid } from "uuid";
 
 import { CanvasHelper, DefaultStyle } from "@/lib/canvas-helpers";
@@ -30,6 +31,7 @@ export class Square implements ICanvasObjectWithId {
         this.style = { ...(style ?? DefaultStyle) };
         this.Board = parent;
         this.order = order ?? 0;
+        makeObservable(this);
     }
     x = 0;
     y = 0;

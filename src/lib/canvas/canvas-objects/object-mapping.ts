@@ -7,6 +7,7 @@ import { Line } from "./line";
 import { Pencil } from "./pencil";
 import { Rectangle } from "./rectangle";
 import { Square } from "./square";
+import { Table } from "./table";
 import { Text } from "./text";
 
 export const CavasObjectMap: {
@@ -19,6 +20,7 @@ export const CavasObjectMap: {
     [ElementEnum.Pencil]: (initValues, parent) => new Pencil(initValues, parent),
     [ElementEnum.Text]: (initValues, parent) => new Text(initValues, parent),
     [ElementEnum.Image]: (initValues, parent) => new CanvasImage(initValues, parent),
+    [ElementEnum.Table]: (initValues, parent) => new Table(initValues, parent),
     [ElementEnum.Move]: function (): ICanvasObjectWithId {
         throw new Error("Function not implemented.");
     }

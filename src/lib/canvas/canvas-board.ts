@@ -59,6 +59,8 @@ export class CanvasBoard implements ICanvas {
 
     image: ICanvasObjectWithId | null = null;
 
+    tables: ICanvasObjectWithId[] = [];
+
     constructor() {
         this.EventManager = new EventManager(this);
         this._canvas = createRef();
@@ -85,7 +87,9 @@ export class CanvasBoard implements ICanvas {
             text: observable,
             Text: computed,
             image: observable,
-            Image: computed
+            Image: computed,
+            tables: observable,
+            Tables: computed
         });
     }
 
@@ -276,6 +280,22 @@ export class CanvasBoard implements ICanvas {
         this.image = value;
     }
 
+    get Tables() {
+        return this.tables;
+    }
+
+    set Tables(tables: ICanvasObjectWithId[]) {
+        this.tables = tables;
+    }
+
+    get TableIds() {
+        return this.tables.map((t) => t.id);
+    }
+
+    getTable(id: string) {
+        return this.tables.find((t) => t.id == id)!;
+    }
+
     updateText(value: string) {
         if (!this.CanvasCopy || !this.Text) {
             return;
@@ -342,6 +362,10 @@ export class CanvasBoard implements ICanvas {
             return CavasObjectMap[ele.type](ele, this);
         });
         this._elements = objArray;
+        const tables = (metadata.tables ?? []).map((ele) => {
+            return CavasObjectMap[ele.type](ele, this);
+        });
+        this.Tables = tables;
         if (draw) {
             this.redrawBoard();
         }
@@ -557,17 +581,14 @@ export class CanvasBoard implements ICanvas {
         if (this._activeObjects.length > 0) {
             if (this.SelectionElement) {
                 this._elements.push(...this._activeObjects);
-                this._pointerOrigin = null;
                 this.SelectedElements = this._activeObjects;
-                this._activeObjects = [];
-                this._hoveredObject = null;
             } else {
                 this._elements.push(...this._activeObjects);
-                this._pointerOrigin = null;
-                this._activeObjects = [];
-                this._hoveredObject = null;
             }
         }
+        this._pointerOrigin = null;
+        this._activeObjects = [];
+        this._hoveredObject = null;
         if (!this._isElementSelectorLocked) {
             this.ElementType = ElementEnum.Move;
         }
@@ -648,7 +669,8 @@ export class CanvasBoard implements ICanvas {
         return {
             elements: [...this.Elements.map((ele) => ele.getValues())],
             size: { height: this.Height, width: this.Width },
-            transform: this.Transform
+            transform: this.Transform,
+            tables: [...this.Tables.map((ele) => ele.getValues())]
         };
     }
 

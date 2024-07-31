@@ -7,9 +7,10 @@ import { Loader } from "@/components/ui/loader";
 import { useLayout } from "@/hooks/layout-provider";
 import { useCanvas } from "@/hooks/use-canvas";
 
+import { ImageInput } from "../mini-components/image-input";
+import { TablesRenderer } from "../mini-components/tables-renderer";
+import { TextEditorWrapper } from "../mini-components/text-editor";
 import CanvasOptions from "./canvas-options";
-import { ImageInput } from "./image-input";
-import { TextEditorWrapper } from "./text-editor";
 
 export const CanvasBoard = observer(function CanvasBoard() {
     const { setInitiallyVisible } = useLayout();
@@ -55,6 +56,7 @@ export const CanvasBoard = observer(function CanvasBoard() {
             <CanvasOptions name={sketchName} />
             <TextEditorWrapper />
             <ImageInput />
+            <TablesRenderer />
             <canvas id="canvas-board" className="absolute z-10 overscroll-none" ref={canvasBoard.CanvasRef}></canvas>
             <canvas
                 id="canvas-board-copy"

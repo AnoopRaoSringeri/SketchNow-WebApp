@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 import { CanvasBoard } from "@/lib/canvas/canvas-board";
 
 import { AbsPosition, Delta, Position, Size } from "./canvas";
@@ -48,6 +50,7 @@ export type MouseAction = "down" | "move" | "up";
 
 export interface ICanvasObjectMethods {
     draw: (ctx: CanvasRenderingContext2D) => unknown;
+    drawTable?: () => ReactNode;
     create: (ctx: CanvasRenderingContext2D) => unknown;
     update: (
         ctx: CanvasRenderingContext2D,
@@ -119,6 +122,7 @@ export enum ElementEnum {
     Pencil = "pencil",
     Text = "text",
     Image = "image",
+    Table = "table",
     Move = "move"
 }
 

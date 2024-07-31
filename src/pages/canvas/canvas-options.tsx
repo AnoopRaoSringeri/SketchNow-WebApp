@@ -25,7 +25,8 @@ const LeftOptionLists: Option[] = [
     { icon: "Square", value: ElementEnum.Square },
     { icon: "Minus", value: ElementEnum.Line },
     { icon: "Type", value: ElementEnum.Text },
-    { icon: "ImagePlus", value: ElementEnum.Image }
+    { icon: "ImagePlus", value: ElementEnum.Image },
+    { icon: "Table", value: ElementEnum.Table }
 ];
 
 const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }) {

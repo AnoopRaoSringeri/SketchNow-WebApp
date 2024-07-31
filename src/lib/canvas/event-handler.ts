@@ -328,7 +328,10 @@ export class EventManager {
                     this.Board._tempSelectionArea = null;
                 }
             } else {
-                const ele = this.Board.Helper.hoveredElement({ x: offsetX, y: offsetY }, this.Board.Elements);
+                const ele = this.Board.Helper.hoveredElement({ x: offsetX, y: offsetY }, [
+                    ...this.Board.Elements,
+                    ...this.Board.Tables
+                ]);
                 if (ele) {
                     this.Board.CursorPosition = this.Board.Helper.getCursorPosition(
                         { x: offsetX, y: offsetY },
@@ -483,6 +486,13 @@ export class EventManager {
                         ao.move(context, { x: offsetX - x, y: offsetY - y }, "up");
                     });
                 }
+                this.Board.Tables.forEach((t) => {
+                    const table = this.Board.ActiveObjects.find((e) => e.id == t.id);
+                    if (table) {
+                        t.update(context, table.getValues(), "up", false);
+                    }
+                });
+                this.Board.ActiveObjects = this.Board.ActiveObjects.filter((e) => e.type != ElementEnum.Table);
                 this.Board.SelectedElements = this.Board.ActiveObjects;
             } else {
                 this.Board.ActiveObjects.forEach((ao) => {
@@ -496,6 +506,13 @@ export class EventManager {
                         "up"
                     );
                 });
+                if (this.Board.ElementType == ElementEnum.Table) {
+                    this.Board.Tables = [
+                        ...this.Board.Tables,
+                        ...this.Board.ActiveObjects.filter((e) => e.type == ElementEnum.Table)
+                    ];
+                    this.Board.ActiveObjects = [];
+                }
             }
             context.closePath();
             this.Board.saveBoard();
@@ -571,6 +588,15 @@ export class EventManager {
                 this.Board.HoveredObject = ele;
                 this.Board.ActiveObjects = [ele];
                 this.Board.SelectedElements = [ele];
+                this.Board.ActiveObjects[0].move(context, { x: 0, y: 0 }, "down");
+            }
+            const table = this.Board.Helper.hoveredElement({ x: offsetX, y: offsetY }, this.Board.Tables);
+            if (table) {
+                this.Board.Elements = this.Board.Elements.filter((e) => e.id != table.id);
+                this.Board.redrawBoard();
+                this.Board.HoveredObject = table;
+                this.Board.ActiveObjects = [table];
+                this.Board.SelectedElements = [table];
                 this.Board.ActiveObjects[0].move(context, { x: 0, y: 0 }, "down");
             }
         } else {

@@ -96,6 +96,7 @@ export class CanvasHelper {
             case ElementEnum.Circle:
             case ElementEnum.Rectangle:
             case ElementEnum.Image:
+            case ElementEnum.Table:
                 return x >= ucx - hOffSet && x <= ucx + hOffSet && y >= ucy - hOffSet && y <= ucy + hOffSet
                     ? "tl"
                     : x >= ucx - hOffSet && x <= ucx + hOffSet && y >= uh - hOffSet && y <= uh + hOffSet
@@ -198,6 +199,7 @@ export class CanvasHelper {
             case ElementEnum.Rectangle:
             case ElementEnum.Square:
             case ElementEnum.Image:
+            case ElementEnum.Table:
                 break;
             case ElementEnum.Pencil: {
                 let lx = Number.POSITIVE_INFINITY;
@@ -247,12 +249,12 @@ export class CanvasHelper {
         return { offsetX: (x - e) / a, offsetY: (y - f) / a };
     }
 
-    static getTransformedSize({ height, width }: Size, { transformX: e, transformY: f, scaleX: a }: ICanvasTransform) {
-        return { width: width / (a + 1) / a, height: height / (a + 1) / a };
-    }
-
     static getAbsolutePosition({ x, y }: Position, { transformX: e, transformY: f, scaleX: a }: ICanvasTransform) {
         return { x, y, ax: x * a + e, ay: y * a + f };
+    }
+
+    static getAbsoluteSize({ height, width }: Size, { scaleX: a }: ICanvasTransform) {
+        return { aw: width * a, ah: height * a };
     }
 
     static getSelectedAreaBoundary(elements: ICanvasObjectWithId[]) {
@@ -267,6 +269,7 @@ export class CanvasHelper {
                 case ElementEnum.Square:
                 case ElementEnum.Rectangle:
                 case ElementEnum.Image:
+                case ElementEnum.Table:
                     x = Math.min(x, ex);
                     y = Math.min(y, ey);
                     h = Math.max(h, eh + ey);
