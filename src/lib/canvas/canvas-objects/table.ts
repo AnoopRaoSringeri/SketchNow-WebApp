@@ -122,7 +122,7 @@ export class Table implements ICanvasObjectWithId {
 
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
         let { h = this.h, w = this.w, x = this.x, y = this.y } = objectValue;
-        CanvasHelper.applyStyles(ctx, DefaultStyle);
+        this.Board.Helper.applyStyles(ctx, DefaultStyle);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }
