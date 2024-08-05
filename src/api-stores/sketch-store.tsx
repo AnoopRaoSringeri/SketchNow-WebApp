@@ -33,11 +33,11 @@ class SketchStore {
         }
     }
 
-    async SaveSketch(sketchMetadata: CanvasMetadata, name: string): Promise<SavedCanvas | null> {
+    async SaveSketch(sketchMetadata: CanvasMetadata, name: string, dataUrl: string): Promise<SavedCanvas | null> {
         try {
             const { data }: AxiosResponse<SavedCanvas> = await axios.post(
                 `${BaseUrl}create`,
-                { name, metadata: sketchMetadata },
+                { name, metadata: sketchMetadata, dataUrl },
                 getRequestConfig(true)
             );
             return data;
@@ -46,9 +46,13 @@ class SketchStore {
         }
     }
 
-    async UpdateSketch(id: string, sketchMetadata: CanvasMetadata, name: string): Promise<boolean> {
+    async UpdateSketch(id: string, sketchMetadata: CanvasMetadata, name: string, dataUrl: string): Promise<boolean> {
         try {
-            await axios.post(`${BaseUrl}update/${id}`, { name, metadata: sketchMetadata }, getRequestConfig(true));
+            await axios.post(
+                `${BaseUrl}update/${id}`,
+                { name, metadata: sketchMetadata, dataUrl },
+                getRequestConfig(true)
+            );
             return true;
         } catch (e) {
             return false;
@@ -61,6 +65,18 @@ class SketchStore {
             return true;
         } catch (e) {
             return false;
+        }
+    }
+
+    async GetImageData(id: string): Promise<string | null> {
+        try {
+            const { data }: AxiosResponse<string> = await axios.get(
+                `${BaseUrl}imageData/${id}`,
+                getRequestConfig(true)
+            );
+            return data;
+        } catch (e) {
+            return null;
         }
     }
 }

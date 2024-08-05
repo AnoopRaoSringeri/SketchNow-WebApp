@@ -39,6 +39,7 @@ export type SavedCanvas = {
     name: string;
     metadata: CanvasMetadata;
     createdBy: string;
+    dataUrl?: string;
 };
 
 export interface CanvasMetadata {

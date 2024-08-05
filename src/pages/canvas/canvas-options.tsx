@@ -1,6 +1,6 @@
-import { Save } from "lucide-react";
 import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
+import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
@@ -13,22 +13,8 @@ import { CanvasStyleEditor } from "@/pages/mini-components/canvas-style-editor";
 import { ElementStyleEditor } from "@/pages/mini-components/element-style-editor";
 import { ZoomController } from "@/pages/mini-components/zoom-controller";
 import { ElementEnum } from "@/types/custom-canvas";
-import { Option } from "@/types/layout";
 
 import ElementSelector from "./element-selector";
-
-const LeftOptionLists: Option[] = [
-    { icon: "Move", value: ElementEnum.Move },
-    { icon: "Hand", value: ElementEnum.Pan },
-    { icon: "Pencil", value: ElementEnum.Pencil },
-    { icon: "RectangleHorizontal", value: ElementEnum.Rectangle },
-    { icon: "Circle", value: ElementEnum.Circle },
-    { icon: "Square", value: ElementEnum.Square },
-    { icon: "Minus", value: ElementEnum.Line },
-    { icon: "Type", value: ElementEnum.Text },
-    { icon: "ImagePlus", value: ElementEnum.Image },
-    { icon: "Table", value: ElementEnum.Table }
-];
 
 const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }) {
     const { id } = useParams<{ id: string }>();
@@ -44,16 +30,24 @@ const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }
     const saveBoard = async () => {
         console.log(canvasBoard.Canvas.toDataURL());
         if (id && id != "new") {
-            await sketchStore.UpdateSketch(id, canvasBoard.toJSON(), sketchName);
+            await sketchStore.UpdateSketch(id, canvasBoard.toJSON(), sketchName, canvasBoard.Canvas.toDataURL());
             toast.success("Sketch saved successfully");
         } else {
-            const response = await sketchStore.SaveSketch(canvasBoard.toJSON(), sketchName);
+            const response = await sketchStore.SaveSketch(
+                canvasBoard.toJSON(),
+                sketchName,
+                canvasBoard.Canvas.toDataURL()
+            );
             if (response) {
                 toast.success("Sketch updated successfully");
                 navigate(`/sketch/${response._id}`);
             }
         }
     };
+
+    const { mutate, isLoading } = useMutation({
+        mutationFn: () => saveBoard()
+    });
 
     const goToHome = () => {
         navigate("/sketches");
@@ -63,7 +57,6 @@ const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }
         <div className="absolute flex size-full overflow-hidden bg-transparent">
             <div className=" flex size-full items-center justify-center bg-transparent">
                 <ElementSelector
-                    options={LeftOptionLists}
                     onChange={(eleType) => {
                         canvasBoard.ElementType = eleType;
                     }}
@@ -78,8 +71,8 @@ const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }
                                 setSketchName(e.target.value);
                             }}
                         />
-                        <Button size="sm" onClick={saveBoard}>
-                            <Save />
+                        <Button size="sm" onClick={() => mutate()}>
+                            {isLoading ? <Icon name="LoaderCircle" spin /> : <Icon name="Save" />}
                         </Button>
                     </div>
                 </div>

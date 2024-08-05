@@ -1,6 +1,7 @@
 import { TrashIcon } from "lucide-react";
 import { observer } from "mobx-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { useNavigate } from "react-router";
 
 import { useStore } from "@/api-stores/store-provider";
@@ -8,8 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Loader } from "@/components/ui/loader";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useCanvas } from "@/hooks/use-canvas";
-import { CanvasMetadata, SavedCanvas } from "@/types/canvas";
+import { SavedCanvas } from "@/types/canvas";
 
 import { NoSketch } from "../no-sketch-page";
 
@@ -43,13 +43,7 @@ const SketchList = observer(function SketchList() {
                 <ScrollArea className="size-full p-5" type="auto">
                     <div className="flex flex-1 flex-wrap gap-5 overflow-hidden">
                         {sketches.map((d) => (
-                            <Sketch
-                                key={d._id}
-                                canvasId={d._id}
-                                data={d.metadata}
-                                name={d.name}
-                                onDelete={deleteSketch}
-                            />
+                            <Sketch key={d._id} canvasId={d._id} name={d.name} onDelete={deleteSketch} />
                         ))}
                     </div>
                 </ScrollArea>
@@ -60,28 +54,24 @@ const SketchList = observer(function SketchList() {
 
 export default SketchList;
 
-const Sketch = observer(function Sketch({
+const Sketch = function Sketch({
     canvasId,
-    data,
     name,
     onDelete
 }: {
     canvasId: string;
-    data: CanvasMetadata;
     name: string;
     onDelete: (id: string) => unknown;
 }) {
-    const [svg, setSvg] = useState("");
-    const { canvasBoard } = useCanvas(canvasId);
-    const canvasRef = canvasBoard.CanvasRef;
-    const imageRef = useRef<SVGImageElement>(null);
+    const { sketchStore } = useStore();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        canvasBoard.loadBoard(data, { readonly: true });
-        setSvg(canvasBoard.toSVG({ height: 200, width: 300 }));
-        return () => canvasBoard.dispose();
-    }, [canvasRef, imageRef]);
+    const { data, isLoading } = useQuery({
+        queryFn: async () => {
+            return await sketchStore.GetImageData(canvasId);
+        },
+        queryKey: ["SketchImageData", canvasId]
+    });
 
     const onClick = () => {
         navigate(`/sketch/${canvasId}`);
@@ -90,6 +80,7 @@ const Sketch = observer(function Sketch({
     return (
         <>
             <div className="group relative flex flex-col items-center gap-0 rounded-sm">
+                <Loader loading={isLoading} />
                 <div className="absolute right-0 top-0 ">
                     <Button
                         size="xs"
@@ -100,14 +91,13 @@ const Sketch = observer(function Sketch({
                         <TrashIcon size={20} color="white" />
                     </Button>
                 </div>
-                <canvas ref={canvasRef} onClick={onClick} className="hidden" />
-                <div
-                    dangerouslySetInnerHTML={{ __html: svg }}
+                <img
                     onClick={onClick}
                     className=" box-content aspect-square h-[200px] w-[300px] cursor-pointer rounded-sm border-2 border-gray-500/30 object-cover"
+                    src={data ?? ""}
                 />
                 <Label className="p-1 text-lg">{name}</Label>
             </div>
         </>
     );
-});
+};
