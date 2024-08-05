@@ -588,7 +588,7 @@ export class CanvasBoard implements ICanvas {
         }
         this._pointerOrigin = null;
         this._activeObjects = [];
-        this._hoveredObject = null;
+        // this._hoveredObject = null;
         if (!this._isElementSelectorLocked) {
             this.ElementType = ElementEnum.Move;
         }

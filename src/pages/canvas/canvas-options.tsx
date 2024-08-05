@@ -19,6 +19,7 @@ import ElementSelector from "./element-selector";
 
 const LeftOptionLists: Option[] = [
     { icon: "Move", value: ElementEnum.Move },
+    { icon: "Hand", value: ElementEnum.Pan },
     { icon: "Pencil", value: ElementEnum.Pencil },
     { icon: "RectangleHorizontal", value: ElementEnum.Rectangle },
     { icon: "Circle", value: ElementEnum.Circle },

@@ -76,7 +76,7 @@ export class Circle implements ICanvasObjectWithId {
     }
 
     create(ctx: CanvasRenderingContext2D) {
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         ctx.beginPath();
         const { x: ax, y: ay, h: rY, w: rX } = CanvasHelper.getBoundingArea(this.type, this.getValues());
         ctx.ellipse(ax, ay, rX, rY, this.ro, this.sa, this.ea);
@@ -104,7 +104,7 @@ export class Circle implements ICanvasObjectWithId {
     }
 
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         let { h = this.h, w = this.w, x = this.x, y = this.y } = objectValue;
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
@@ -134,8 +134,8 @@ export class Circle implements ICanvasObjectWithId {
 
     updateStyle<T extends keyof IObjectStyle>(ctx: CanvasRenderingContext2D, key: T, value: IObjectStyle[T]) {
         this.style[key] = value;
-        CanvasHelper.applyStyles(ctx, this.style);
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        this.Board.Helper.applyStyles(ctx, this.style);
+        this.Board.Helper.clearCanvasArea(ctx);
         ctx.beginPath();
         const { x: ax, y: ay, h: rY, w: rX } = CanvasHelper.getBoundingArea(this.type, this.getValues());
         ctx.ellipse(ax, ay, rX, rY, this.ro, this.sa, this.ea);
@@ -146,12 +146,11 @@ export class Circle implements ICanvasObjectWithId {
 
     move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }
         this.IsDragging = true;
-        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
         const offsetX = x + this.x;
         const offsetY = y + this.y;
         ctx.beginPath();
@@ -205,7 +204,7 @@ export class Circle implements ICanvasObjectWithId {
 
     resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction, clearCanvas = true) {
         const { dx, dy } = delta;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
 
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);

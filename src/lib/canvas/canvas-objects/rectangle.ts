@@ -78,7 +78,7 @@ export class Rectangle implements ICanvasObjectWithId {
     }
 
     create(ctx: CanvasRenderingContext2D) {
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         ctx.strokeRect(this.x, this.y, this.w, this.h);
         ctx.fillRect(this.x, this.y, this.w, this.h);
     }
@@ -100,7 +100,7 @@ export class Rectangle implements ICanvasObjectWithId {
 
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
         let { h = this.h, w = this.w, x = this.x, y = this.y } = objectValue;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }
@@ -130,7 +130,7 @@ export class Rectangle implements ICanvasObjectWithId {
         clearCanvas = true
     ) {
         this.style[key] = value;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }
@@ -140,7 +140,7 @@ export class Rectangle implements ICanvasObjectWithId {
 
     move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }
@@ -160,7 +160,7 @@ export class Rectangle implements ICanvasObjectWithId {
 
     resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction, clearCanvas = true) {
         const { dx, dy } = delta;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }

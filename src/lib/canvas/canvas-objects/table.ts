@@ -92,7 +92,7 @@ export class Table implements ICanvasObjectWithId {
     }
 
     draw(ctx: CanvasRenderingContext2D) {
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         ctx.strokeRect(this.x, this.y, this.w, this.h);
         ctx.fillRect(this.x, this.y, this.w, this.h);
     }
@@ -147,14 +147,14 @@ export class Table implements ICanvasObjectWithId {
 
     updateStyle<T extends keyof IObjectStyle>(ctx: CanvasRenderingContext2D, key: T, value: IObjectStyle[T]) {
         this.style[key] = value;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         this.Board.Helper.clearCanvasArea(ctx);
         this.draw(ctx);
     }
 
     move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }
@@ -201,7 +201,7 @@ export class Table implements ICanvasObjectWithId {
     }
     resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction, clearCanvas = true) {
         const { dx, dy } = delta;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }

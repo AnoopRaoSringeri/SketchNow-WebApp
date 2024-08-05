@@ -61,7 +61,7 @@ export class Line implements ICanvasObjectWithId {
     }
 
     draw(ctx: CanvasRenderingContext2D) {
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
         if (this.points.length > 0) {
@@ -74,7 +74,7 @@ export class Line implements ICanvasObjectWithId {
     }
 
     create(ctx: CanvasRenderingContext2D) {
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
     }
@@ -95,7 +95,7 @@ export class Line implements ICanvasObjectWithId {
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
         const { points = this.points, x = this.x, y = this.y } = objectValue;
         if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
+            this.Board.Helper.applyStyles(ctx, this.style);
         }
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
@@ -114,7 +114,7 @@ export class Line implements ICanvasObjectWithId {
 
     updateStyle<T extends keyof IObjectStyle>(ctx: CanvasRenderingContext2D, key: T, value: IObjectStyle[T]) {
         this.style[key] = value;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         this.Board.Helper.clearCanvasArea(ctx);
         this.draw(ctx);
     }
@@ -122,7 +122,7 @@ export class Line implements ICanvasObjectWithId {
     move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction) {
         const { x, y } = position;
         if (action == "down") {
-            CanvasHelper.applyStyles(ctx, this.style);
+            this.Board.Helper.applyStyles(ctx, this.style);
         }
         this.Board.Helper.clearCanvasArea(ctx);
         ctx.beginPath();

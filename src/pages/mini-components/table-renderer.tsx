@@ -27,7 +27,6 @@ export const TableRenderer = observer(function TableRenderer({
     const [data, setData] = useState<string[][]>([]);
     const { uploadStore } = useStore();
     const { ax, ay } = CanvasHelper.getAbsolutePosition({ x, y }, transform);
-    const { ah, aw } = CanvasHelper.getAbsoluteSize({ height: h, width: w }, transform);
 
     useEffect(() => {
         loadData();
@@ -36,15 +35,15 @@ export const TableRenderer = observer(function TableRenderer({
     const loadData = async () => {
         setLoading(true);
         const res = await uploadStore.GetData(id);
-        setData(res.data.slice(0, 10));
+        setData(res.data);
         setLoading(false);
     };
 
     const style: React.CSSProperties = {
         top: ay,
         left: ax,
-        height: ah,
-        width: aw,
+        height: h * transform.scaleX,
+        width: w * transform.scaleX,
         position: "absolute",
         display: "flex",
         alignItems: "center",
@@ -55,7 +54,7 @@ export const TableRenderer = observer(function TableRenderer({
     const upload = async (file: File, id: string) => {
         setLoading(true);
         const res = await uploadStore.UploadFile(file, id);
-        setData(res.data.slice(0, 10));
+        setData(res.data);
         setLoading(false);
     };
 
@@ -76,7 +75,8 @@ export const TableRenderer = observer(function TableRenderer({
                 <ScrollArea
                     className="size-full border border-gray-50/10"
                     style={{
-                        zIndex: isLocked ? 0 : 50
+                        zIndex: isLocked ? 0 : 50,
+                        zoom: transform.scaleX
                     }}
                 >
                     <Table>

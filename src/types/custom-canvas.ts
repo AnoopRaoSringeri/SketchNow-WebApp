@@ -123,7 +123,8 @@ export enum ElementEnum {
     Text = "text",
     Image = "image",
     Table = "table",
-    Move = "move"
+    Move = "move",
+    Pan = "pan"
 }
 
 export enum CanvasActionEnum {

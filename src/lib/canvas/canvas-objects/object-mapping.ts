@@ -23,5 +23,8 @@ export const CavasObjectMap: {
     [ElementEnum.Table]: (initValues, parent) => new Table(initValues, parent),
     [ElementEnum.Move]: function (): ICanvasObjectWithId {
         throw new Error("Function not implemented.");
+    },
+    [ElementEnum.Pan]: function (): ICanvasObjectWithId {
+        throw new Error("Function not implemented.");
     }
 };

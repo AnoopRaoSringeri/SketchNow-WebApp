@@ -40,7 +40,7 @@ export class EventManager {
         }
         const { offsetX, offsetY } = CanvasHelper.getCurrentMousePosition(e, this.Board.Transform);
         this.Board.PointerOrigin = { x: offsetX, y: offsetY };
-        if (e.detail == 1 && e.ctrlKey) {
+        if (this.Board.ElementType == ElementEnum.Pan || (e.detail == 1 && e.ctrlKey)) {
             this.Board._currentCanvasAction = CanvasActionEnum.Pan;
             this.Board.PointerOrigin = { x: e.offsetX, y: e.offsetY };
         } else if (this.Board.ElementType == ElementEnum.Move) {
@@ -57,6 +57,7 @@ export class EventManager {
                     } else {
                         this.Board.ActiveObjects.forEach((ao) => {
                             ao.move(context, { x: 0, y: 0 }, "down");
+                            ao.set("ShowSelection", true);
                         });
                         this.Board._currentCanvasAction = CanvasActionEnum.Select;
                     }

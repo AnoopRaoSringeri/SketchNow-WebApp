@@ -92,7 +92,7 @@ export class CanvasImage implements ICanvasObjectWithId {
         if (this.value == "") {
             return;
         }
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (this.image.src == "" || this.image.src == null) {
             this.image.src = this.value;
             this.image.onload = () => {
@@ -115,24 +115,40 @@ export class CanvasImage implements ICanvasObjectWithId {
     }
 
     update(ctx: CanvasRenderingContext2D, objectValue: Partial<IObjectValue>, action: MouseAction, clearCanvas = true) {
-        const { value = "" } = objectValue;
+        let { h = this.h, w = this.w, x = this.x, y = this.y } = objectValue;
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }
-        this.value = value;
-        this.draw(ctx);
+        if (objectValue.value && objectValue.value != "") {
+            this.value = objectValue.value;
+        }
+        if (h < 0) {
+            y = y + h;
+            h = Math.abs(h);
+        }
+        if (w < 0) {
+            x = x + w;
+            w = Math.abs(w);
+        }
+        ctx.drawImage(this.image, x, y, w, h);
+        if (action == "up") {
+            this.h = h;
+            this.w = w;
+            this.x = x;
+            this.y = y;
+        }
     }
 
     updateStyle<T extends keyof IObjectStyle>(ctx: CanvasRenderingContext2D, key: T, value: IObjectStyle[T]) {
         this.style[key] = value;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         this.Board.Helper.clearCanvasArea(ctx);
         this.draw(ctx);
     }
 
     move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }
@@ -174,7 +190,7 @@ export class CanvasImage implements ICanvasObjectWithId {
     }
     resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction, clearCanvas = true) {
         const { dx, dy } = delta;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }

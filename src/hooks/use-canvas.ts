@@ -13,6 +13,7 @@ export function useCanvas(canvasId: string) {
     } else {
         canvasBoard = savedCanvas;
     }
+    // const copy = window;
     const copy = canvasBoard.CanvasCopy;
 
     useEffect(() => {

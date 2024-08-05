@@ -84,7 +84,7 @@ export class Text implements ICanvasObjectWithId {
     }
 
     draw(ctx: CanvasRenderingContext2D) {
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         ctx.fillText(this.value, this.x, this.y);
         ctx.restore();
     }
@@ -108,14 +108,14 @@ export class Text implements ICanvasObjectWithId {
 
     updateStyle<T extends keyof IObjectStyle>(ctx: CanvasRenderingContext2D, key: T, value: IObjectStyle[T]) {
         this.style[key] = value;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         this.Board.Helper.clearCanvasArea(ctx);
         this.draw(ctx);
     }
 
     move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }

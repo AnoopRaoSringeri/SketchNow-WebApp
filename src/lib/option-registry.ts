@@ -57,6 +57,7 @@ export const OptionRegistry: OptionRegistryType = {
     ],
     [ElementEnum.Pencil]: [...BaseOptions],
     [ElementEnum.Move]: [],
+    [ElementEnum.Pan]: [],
     [ElementEnum.Image]: [],
     [ElementEnum.Table]: []
 };

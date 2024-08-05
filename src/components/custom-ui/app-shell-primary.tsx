@@ -106,7 +106,7 @@ export const AppShellPrimary = observer(function AppShell2({
                     <nav className="ml-1 flex items-center">
                         <ModeToggle />
                         <LayoutToggle />
-                        <DropdownMenu modal={false}>
+                        <DropdownMenu modal={true}>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="simple" size="icon">
                                     <Icon name="User" />

@@ -94,7 +94,7 @@ export class Pencil implements ICanvasObjectWithId {
 
     draw(ctx: CanvasRenderingContext2D) {
         ctx.save();
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         const stroke = getStroke(this.points, {
             size: this.style.strokeWidth,
             ...options
@@ -110,7 +110,7 @@ export class Pencil implements ICanvasObjectWithId {
     }
 
     create(ctx: CanvasRenderingContext2D) {
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
     }
 
     select({ points = this.points }: Partial<IObjectValue>) {
@@ -145,7 +145,7 @@ export class Pencil implements ICanvasObjectWithId {
         if (points.length == 0) {
             return;
         }
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }
@@ -175,7 +175,7 @@ export class Pencil implements ICanvasObjectWithId {
 
     move(ctx: CanvasRenderingContext2D, position: Position, action: MouseAction, clearCanvas = true) {
         const { x, y } = position;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }
@@ -245,7 +245,7 @@ export class Pencil implements ICanvasObjectWithId {
     }
     resize(ctx: CanvasRenderingContext2D, delta: Delta, cPos: CursorPosition, action: MouseAction, clearCanvas = true) {
         const { dx, dy } = delta;
-        CanvasHelper.applyStyles(ctx, this.style);
+        this.Board.Helper.applyStyles(ctx, this.style);
         if (clearCanvas) {
             this.Board.Helper.clearCanvasArea(ctx);
         }

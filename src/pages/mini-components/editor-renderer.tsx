@@ -93,7 +93,7 @@ export const Renderer = observer(function Renderer({
                     <Label className="text-sm">{label}</Label>
                     <Slider
                         value={[value as number]}
-                        max={100}
+                        max={1000}
                         step={1}
                         onValueChange={(values) => {
                             onChange(key, values[0]);
@@ -122,7 +122,7 @@ const FontEditor = function FontEditor({ font, onChange }: { font: Font | null; 
             <Label className="text-sm">Size</Label>
             <Slider
                 value={[size as number]}
-                max={100}
+                max={1000}
                 step={1}
                 onValueChange={(values) => {
                     onChange({ ...font, size: values[0] });

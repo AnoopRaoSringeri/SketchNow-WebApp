@@ -312,7 +312,7 @@ export class CanvasHelper {
         return { x: -xf, y: -yf, w: size.width + xf * 2, h: size.height + yf * 2 };
     }
 
-    static applyStyles(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, style: IObjectStyle) {
+    applyStyles(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, style: IObjectStyle) {
         ctx.save();
         const { fillColor, strokeStyle, strokeWidth, opacity, font } = style;
         ctx.fillStyle = fillColor;
@@ -320,7 +320,7 @@ export class CanvasHelper {
         ctx.lineWidth = strokeWidth;
         ctx.globalAlpha = opacity / 100;
         ctx.lineCap = "round";
-        ctx.font = this.getFont(font);
+        ctx.font = CanvasHelper.getFont(font);
         if (font) {
             ctx.fillStyle = font.color;
             ctx.textBaseline = "top";
