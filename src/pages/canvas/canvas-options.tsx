@@ -9,10 +9,8 @@ import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { useCanvas } from "@/hooks/use-canvas";
-import { CanvasStyleEditor } from "@/pages/mini-components/canvas-style-editor";
-import { ElementStyleEditor } from "@/pages/mini-components/element-style-editor";
+import { StyleEditorWrapper } from "@/pages/mini-components/canvas-style-editor";
 import { ZoomController } from "@/pages/mini-components/zoom-controller";
-import { ElementEnum } from "@/types/custom-canvas";
 
 import ElementSelector from "./element-selector";
 
@@ -81,8 +79,7 @@ const CanvasOptions = observer(function CanvasOptions({ name }: { name: string }
                         <Icon size="20px" name="House" />
                     </Button>
                 </div>
-                {canvasBoard.ElementType == ElementEnum.Move ? null : <CanvasStyleEditor />}
-                <ElementStyleEditor />
+                <StyleEditorWrapper />
                 <ZoomController />
             </div>
         </div>

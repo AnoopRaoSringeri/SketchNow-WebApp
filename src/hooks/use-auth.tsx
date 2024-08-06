@@ -58,7 +58,7 @@ export function useAuth() {
         const res = await authStore.Register(values);
         if (res) {
             toast.success("User registered successfully");
-            navigate("/login");
+            navigate("/");
         } else {
             toast.error("User registration failed");
         }

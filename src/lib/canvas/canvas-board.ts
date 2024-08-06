@@ -434,6 +434,7 @@ export class CanvasBoard implements ICanvas {
 
     removeElement(id: string) {
         this._elements = this.Elements.filter((e) => e.id != id);
+        this.tables = this.Tables.filter((e) => e.id != id);
         this.SelectedElements = [];
         this.redrawBoard();
     }

@@ -60,16 +60,20 @@ export const TableRenderer = observer(function TableRenderer({
 
     const headers: string[] = data.length > 0 ? data[0] : [];
 
+    function removeElement() {
+        board.removeElement(id);
+    }
+
     return (
         <div style={style}>
-            <Button
-                onClick={() => setIsLocked((pre) => !pre)}
-                className="absolute bottom-5 right-5 z-[60]"
-                size="icon"
-                variant="ghost"
-            >
-                {isLocked ? <Icon name="LockOpen" /> : <Icon name="Lock" />}
-            </Button>
+            <div className="absolute bottom-5 right-5 z-[60]">
+                <Button onClick={() => setIsLocked((pre) => !pre)} size="icon" variant="ghost">
+                    {isLocked ? <Icon name="LockOpen" /> : <Icon name="Lock" />}
+                </Button>
+                <Button onClick={removeElement} size="icon" variant="destructive">
+                    <Icon name="Trash2" />
+                </Button>
+            </div>
             <Loader loading={loading} />
             {data.length > 0 ? (
                 <ScrollArea

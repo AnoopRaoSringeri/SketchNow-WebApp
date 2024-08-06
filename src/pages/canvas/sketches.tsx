@@ -80,22 +80,29 @@ const Sketch = function Sketch({
     return (
         <>
             <div className="group relative flex flex-col items-center gap-0 rounded-sm">
-                <Loader loading={isLoading} />
-                <div className="absolute right-0 top-0 ">
-                    <Button
-                        size="xs"
-                        variant="destructive"
-                        onClick={() => onDelete(canvasId)}
-                        className="opacity-0  transition duration-300 group-hover:opacity-100"
-                    >
-                        <TrashIcon size={20} color="white" />
-                    </Button>
-                </div>
-                <img
-                    onClick={onClick}
-                    className=" box-content aspect-square h-[200px] w-[300px] cursor-pointer rounded-sm border-2 border-gray-500/30 object-cover"
-                    src={data ?? ""}
-                />
+                {isLoading ? (
+                    <div className=" box-content aspect-square h-[200px] w-[300px] cursor-pointer rounded-sm border-2 border-gray-500/30 object-cover">
+                        <Loader loading={isLoading} />
+                    </div>
+                ) : (
+                    <>
+                        <div className="absolute right-0 top-0 ">
+                            <Button
+                                size="xs"
+                                variant="destructive"
+                                onClick={() => onDelete(canvasId)}
+                                className="opacity-0  transition duration-300 group-hover:opacity-100"
+                            >
+                                <TrashIcon size={20} color="white" />
+                            </Button>
+                        </div>
+                        <img
+                            onClick={onClick}
+                            className=" box-content aspect-square h-[200px] w-[300px] cursor-pointer rounded-sm border-2 border-gray-500/30 object-cover"
+                            src={data ?? ""}
+                        />
+                    </>
+                )}
                 <Label className="p-1 text-lg">{name}</Label>
             </div>
         </>
